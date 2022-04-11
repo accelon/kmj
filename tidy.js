@@ -5,8 +5,8 @@ import {filesOf} from './src/kmj-folder.js'
 import HTMLErrata from './src/html-errata.js';
 await nodefs; //export fs to global
 const srcfolder='./html/'; 
-const desfolder='./json/';
-const testfn='dn01c01.html';
+const desfolder='./raw/';
+
 if (!fs.existsSync(desfolder)) fs.mkdirSync(desfolder);
 const bkid=process.argv[2]||'m1';
 if (!process.argv[2]) console.log('file pattern',kluer.yellow('dn1~dn3, d1~d34, mn1~mn3, m1~m152, sn1~sn5, s1~s56, a1~a11'));
@@ -36,8 +36,6 @@ const toPlainText=content=>{
 		if (first5==='語	語根	') {prefix='㊔';continue;}	
 		if (first5==='述語	語根') {prefix='㊒';continue;}
 		if (line) out.push(prefix+line);
-		if (prefix==='㊟' || prefix==='㉆') prefix='㊣';//reset
-
 	}
 	return out;
 }
@@ -49,7 +47,7 @@ books.forEach(book=>{
 		const output=toPlainText(content);
 		out.push(...output);
 	});
-	if (writeChanged(book+'.txt',out.join('\n'))) {
+	if (writeChanged(desfolder+book+'.txt',out.join('\n'))) {
 		console.log('written',book,out.length);
 	}
 })
