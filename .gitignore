@@ -3,3 +3,6 @@ off
 json
 *.7z
 *.txt
+*.json
+*.html
+*.cmd

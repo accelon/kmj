@@ -1,9 +1,7 @@
 import {kluer,nodefs,glob, writeChanged,filesFromPattern, readTextContent,patchBuf, readTextLines} from 'pitaka/cli';
 import Errata from './src/raw-errata.js';
-import {parseRaw} from './src/raw-format.js';
-import {TList,TIASTList,IASTTokenizer,combineList} from 'pitaka/denote'
-import {isIAST} from 'pitaka/utils'
-
+import {parseRaw} from './src/raw-format.js'; 
+import {TDenList, diffList,tokenizeIASTPunc} from 'pitaka/denote'
 await nodefs; //export fs to global
 const srcfolder='./raw/'
 const desfolder='./json/'
@@ -11,33 +9,17 @@ if (!fs.existsSync(desfolder)) fs.mkdirSync(desfolder);
 
 const pat=process.argv[2]|| 'd1';
 const files=filesFromPattern(pat+'?' , srcfolder);
-const pattern=/([a-zA-Zḍṭṇñḷṃṁṣśṅṛāīūâîû]+[a-zA-Zḍṭṇñḷṃṁṣśṅṛāīūâîû\-\(\)]+[a-zA-Zḍṭṇñḷṃṁṣśṅṛāīūâîû’]+)/ig;
-const addDef=(Defs,rawtoken,def)=>{
+
+const addDef=(Defs,rawtoken,rawdef)=>{
     let used=false;
-    const tokens=IASTTokenizer(rawtoken,{tokenOnly:true,pattern});
-    if (tokens.length==1) {
-        Defs.push([rawtoken , def]);
-    } else {
-        for (let i=0;i<tokens.length;i++) {
-            if ( isIAST(tokens[i])) {
-                if (!used) {
-                    Defs.push([ tokens[i], def]);
-                    used=true;
-                } else {
-                    console.log("more than one token", rawtoken, tokens[i])
-                }
-            } else {
-                Defs.push([tokens[i],'']);
-            }
-        }
-    }
+    Defs.push([rawtoken,{rawdef}]);
 }
 
 files.forEach(fn=>{
     const content=patchBuf( readTextContent(srcfolder+fn), Errata[fn]);
     const sents=parseRaw(content.split(/\r?\n/));
     sents.forEach(({pali,defs},idx)=>{
-        const vri=new TIASTList(pali,{akey:'vri'});
+        const vri=new TDenList(pali,{akey:'vri',lang:'iast'});
         const Defs=[];
         defs.forEach(def=>{
             const at=def.indexOf('\t');
@@ -47,8 +29,12 @@ files.forEach(fn=>{
                 
             }
         });
-        const kmj=new TList(Defs,{akey:'kmj'});
-        if (idx==13) console.log(combineList(kmj,vri))
+        const kmj=new TDenList(Defs,{akey:'kmj',lang:'iast'});
+        
+        const diff=diffList(vri,kmj);//.filter(it=>it.m);
+        if (idx==0){
+            console.log(diff);//,vri.data,kmj.data)
+        }
     })
 })
 // readTextContent(srcfolder+fn+)

@@ -167,8 +167,8 @@ export const filesFolders={
     sn3:["sn/sn{22-34}"] ,
     sn4:["sn/sn{35-44}"] ,
     sn5:["sn/sn{45-56}"] ,
-    an1:["an/an1$"],an2:["an/an2$"],an3:["an/an3$"],an4:["an/an4$"], an5:["an/an5$"],
-    an6:["an/an6$"],an7:["an/an7$"],an8:["an/an8$"],an9:["an/an9$"], an10:["an/an10$"],an11:["an/an11$"],
+    an1:["an/an01?"],an2:["an/an02?"],an3:["an/an03?"],an4:["an/an04?"], an5:["an/an05?"],
+    an6:["an/an06?"],an7:["an/an07?"],an8:["an/an08?"],an9:["an/an09?"], an10:["an/an10?"],an11:["an/an11?"],
 }
 
 for (let i=1;i<=56;i++) filesFolders['s'+i]=['sn/sn'+i.toString().padStart(2,'0')+'c?'];
