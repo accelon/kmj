@@ -76,5 +76,6 @@ export const DefPatch={
 	'an5_209-3':{'sārajjanti':'saṃ-raj	動	現	能	複	三	執着する、貪着する'},
 	'sn4_351-31':{'labheyyaṃ':'labh	動	願	能反	依（属）	一	得る'},
 	'sn3_347-10':{'carāma':'car	動	現	能	複	一	行ずる'},
-	'an7_72-90':bhavissati
+	'an7_72-90':bhavissati,
+	'an10_111-6':{'asekhāya':'a-śikṣ	名	a	女	単	具	無学'}
 }

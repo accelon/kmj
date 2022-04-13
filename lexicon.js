@@ -1,12 +1,12 @@
 /* create a lexicon */
 import {kluer,nodefs,glob, writeChanged,filesFromPattern, readTextContent,patchBuf, readTextLines} from 'pitaka/cli';
 await nodefs;
-import {eachSentence,parseRawDefLine} from './src/raw-format.js'; 
+import {eachSentence,eachDef} from './src/raw-format.js'; 
 import {Lexicon} from './src/lexicon.js'
 
 const srcfolder='./raw/'
 
-const files=filesFromPattern('[ds]n?',srcfolder);
+const files=filesFromPattern('n?',srcfolder);
 const ctx={lexicon:new Lexicon() };
 
 console.log('building lexicon');
@@ -15,12 +15,11 @@ files.forEach(fn=>{
 	const lines=readTextLines(srcfolder+fn);
 	ctx.fn=fn;
 	eachSentence( lines,ctx,(cb,pali,defs)=>{
-		eachDef( defs, ctx )
-		defs.map(line=>{
+		defs.forEach(line=>{
 			eachDef(line,ctx,(entry,def)=>{
 				ctx.lexicon.addRawDef(entry,def);
-			});
-		});
+			});	
+		})
 	});
 })
 

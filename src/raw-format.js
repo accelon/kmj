@@ -76,6 +76,6 @@ export const eachDef=(str,ctx,cb)=>{
 	}
 
 	if (err){
-		console.log('error def',pn,str)
+		console.log('error def',ctx.fn,ctx.pn,str)
 	}
 }
