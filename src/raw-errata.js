@@ -11,6 +11,7 @@ export const LemmaPatch={
 	'dn1_27-2':{'anupp(p)adānaṃ':'anuppadānaṃ','tappan(ṇ)aṃ':'tappanaṃ'},
 	'dn1_31-1':{'upatt(kk)ilese':'upakkilese'}, //dn1 31-1 should be upkkilese
 	'dn1_46-8':{'s(p)ammussati':'pammussati','s(p)ammussati.':'pammussati.'}, //dn1 46-8
+	'dn1_171-2':{'naatthi':'natthi'},
 	'dn1_155-3':{'sañjayaṃ':'sañcayaṃ'},// 155-4
 	'dn1_155-4':{'sañjayaṃ':'sañcayaṃ'},
 	'dn1_171-2':{'naatthi':'natthi'},
@@ -77,5 +78,6 @@ export const DefPatch={
 	'sn4_351-31':{'labheyyaṃ':'labh	動	願	能反	依（属）	一	得る'},
 	'sn3_347-10':{'carāma':'car	動	現	能	複	一	行ずる'},
 	'an7_72-90':bhavissati,
-	'an10_111-6':{'asekhāya':'a-śikṣ	名	a	女	単	具	無学'}
+	'an10_111-6':{'asekhāya':'a-śikṣ	名	a	女	単	具	無学'},
+		
 }

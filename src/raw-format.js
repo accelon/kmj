@@ -49,33 +49,26 @@ export const eachSentence=(lines,ctx,cb)=>{
 		const {pn,defs,pali}=out[i];
 		ctx.pn=pn;
 		ctx.defpatch=DefPatch[ctx.fnpf+'_'+pn];
-		ctx.lemmaPatch=LemmaPatch[ctx.fnpf+'_'+pn];
-		cb(pn,pali,defs)	
+		ctx.lemmapatch=LemmaPatch[ctx.fnpf+'_'+pn];
+		cb(pn,pali,defs);
 	}
 }
-
 export const eachDef=(str,ctx,cb)=>{
 	const at=str.indexOf('\t');
 	let err=false;
 	if (at==-1) { //expansion
-		str.replace(/(\d+\-\d+)/g,(m,m1)=>{
-			//console.log(pn,m1);
-		});
+		err=true;
 	} else {
 		let entry=normalizeLemma(str.slice(0,at));
-		if (ctx.lemmapatch&&ctx.lemmapatch[entry]) entry=ctx.lemmapatch[entry];
-			
+		//if (ctx.pn=='171-2') console.log(ctx.pn,entry,ctx.lemmapatch)
+		if (ctx.lemmapatch&&ctx.lemmapatch[entry]) {
+			// console.log('patch lemma',entry,ctx.lemmapatch[entry]);
+			entry=ctx.lemmapatch[entry];
+		}
 		let def=str.slice(at+1);
 		if (ctx.defpatch&&ctx.defpatch[entry]) def=ctx.defpatch[entry];
-		if (def.indexOf('\t')==-1) {
-			if (def==='同上') {
-			} else err=true;
-		} else {
-			cb(entry,def);
-		}	
+		if (def.indexOf('\t')==-1 && def!=='同上') err=true;
+		else cb(entry,def);
 	}
-
-	if (err){
-		console.log('error def',ctx.fn,ctx.pn,str)
-	}
+	if (err) console.log('error def',ctx.fn,ctx.pn,str)
 }

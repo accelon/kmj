@@ -29,6 +29,7 @@ const toPlainText=(content,fn)=>{
 		          .replace(/　/g,' ').replace(/ +/g,' ').replace(/ ?\t ?/g,'\t').trim();
 		
 		if (line.indexOf('次へ→')>-1) continue;
+		if (line.indexOf('←前へ')>-1) continue;
 		const m=line.match(/^([\d\-]+)\.$/);
 		if (m) {out.push('^n'+m[1]);prefix='㊣';continue;}
 		const first5=line.slice(0,5);
@@ -37,7 +38,7 @@ const toPlainText=(content,fn)=>{
 		if (first5==='語	語根	') {prefix='㊔';continue;}	
 		if (first5==='述語	語根') {prefix='㊒';continue;}
 
-		if (line[0]==='㊣') prefix='㊣';//override
+		if (line[0]==='㊣' && line.match(/[a-z]/) ) prefix='㊣';//override
 
 		if (line) out.push(prefix+line.replace(/㊣/g,'')); //remove extra ㊣
 		if (line.indexOf("<")>-1) {
