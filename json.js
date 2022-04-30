@@ -2,7 +2,7 @@ import {kluer,nodefs,glob, writeChanged,filesFromPattern, readTextContent,patchB
 import {Lexicon} from './src/lexicon.js';
 import {eachDef, eachSentence} from './src/raw-format.js'; 
 import {TDenList,diffList} from 'pitaka/denote'
-import {breakCompound} from './src/compound.js'
+import {breakCompound,matchCompound,loadKnownDecompose} from './src/compound.js'
 
 await nodefs; //export fs to global
 const srcfolder='./raw/'
@@ -33,7 +33,7 @@ const addDecompose=decomposes=>{
     decomposes.forEach(line=>{
         const [w,part]=line.split('\t');
         Decompose.addRawDef(w,part);
-    })
+    });
 }
 const findLemma=(lemmas,entry,from=0,debug)=>{
     let at=lemmas.lastIndexOf(entry);
@@ -48,13 +48,10 @@ const reuseLemmas=(rawdef,lemmas,locallex,j,ctx)=>{
     let newj=j;//consumed following rawdefs
     const found=[];
     const reuse=new TDenList(rawdef,{akey:'reuse',lang:'iast'});
-    const debug=ctx.pn=='15-39';
     //if (debug) console.log(lemmas)
     for (let i=0;i<reuse.data.length;i++){
         const lemma=reuse.data[i].tk;
-        const at=findLemma(lemmas,lemma,0,debug&&lemma=='vacī');
-        if (debug&&lemma=='vacī') console.log('vacī',at,'LEMMA')
-        
+        const at=findLemma(lemmas,lemma);        
         if (at>-1) {
             found.push(lemmas[at])
         } else {
@@ -63,7 +60,6 @@ const reuseLemmas=(rawdef,lemmas,locallex,j,ctx)=>{
                 found.push(lemma);//one def, no ambiguity
             } else {
                 const at=findLemma(locallex,lemma,newj); //look ahead
-                if (debug) console.log(lemma,at,newj)
                 if (at>j) {
                     found.push(locallex[at])
                     newj=at;
@@ -112,17 +108,32 @@ const parseNormalDef=(rawdef,locallex,ctx)=>{
     })
     return out;
 }
+const isIdentical=(rawdefs,ctx)=>{
+    if (rawdefs.length==1) {
+        const m=rawdefs[0].match(/\((\d+\-\d+)\.\)/);
+        if (m) {
+            return m[1];
+        }
+    }
+}
+
 const isNormalDef=rawdef=>rawdef.indexOf('\t')>-1;
 let errcount=0;
+const genDecomposes=false; //產生decomposes.txt ，供validdecompose.js找出可能的拆分
+ctx.knownDecompose=loadKnownDecompose( readTextLines('./knowndecompose.txt'));
+
+
 files.forEach(fn=>{
     const out=[];
     const lines=readTextLines(srcfolder+fn);
     //lines.length=114;
     ctx.fn=fn;
     ctx.fnpf=fn.replace('.txt','');
+    process.stdout.write('\r'+ctx.fn+'       ')
     eachSentence(lines,ctx,(pn,pali,rawdefs)=>{
+        ctx.debug=pn=='2-1';
         const lemmas=[];
-        let expanded,j=0;
+        let j=0, done =false;
         ctx.pn=pn;
         const locallex=[];
         for (let j=0;j<rawdefs.length;j++) { //預先建好 本段的 lexicon 
@@ -130,7 +141,15 @@ files.forEach(fn=>{
                 locallex[j]=parseNormalDef(rawdefs[j],locallex,ctx)[0];
             }
         }
-        while (j<rawdefs.length){
+        const identical=isIdentical(rawdefs,ctx);
+        if (identical) {
+            const reuse=pnlemmas[ctx.fnpf+'_'+identical];
+            if (reuse) {
+                lemmas.push(...reuse);
+                done=true;
+            }
+        }
+        if (!done) while (j<rawdefs.length){
             const rawdef=rawdefs[j];
             if (isNormalDef(rawdef)) { 
                 lemmas.push(locallex[j]);
@@ -138,8 +157,7 @@ files.forEach(fn=>{
                 rawdef.replace(/(\d+\-\d+)/g,(m,m1)=>{
                     const expand = pnlemmas[ctx.fnpf+'_'+m1];
                     if (expand) {
-                        if (!expanded)expanded=[];
-                        expanded.push(...expand);
+                        lemmas.push(...expand)
                     } else {
                         console.log('wrong pn',m1)
                     }
@@ -151,11 +169,12 @@ files.forEach(fn=>{
             }
             j++;
         }
-        if (expanded) {
-           //diff(pali, expanded.join(' '), lemmas)
-        } else {
+
+        if (genDecomposes) {
             const decomposes=breakCompound(pali, lemmas.join(' '),ctx);
-            if (decomposes) addDecompose(decomposes);
+            if (decomposes) addDecompose(decomposes);            
+        } else {
+            matchCompound(pali,lemmas, lexicon, ctx);
         }
 
         addLemmas(ctx.fnpf+'_'+pn,lemmas);
@@ -164,10 +183,16 @@ files.forEach(fn=>{
     })
     const outfn=desfolder+fn.replace('.txt','.json');
     const outcontent=JSON.stringify(out,'',' ');
-    // if (writeChanged(outfn,outcontent)) {
-    //     console.log('written',outfn,outcontent.length)
-    // }
+    if (writeChanged(outfn,outcontent)) {
+        console.log('written',outfn,outcontent.length)
+    }
 })
 
-Decompose.packRaw();
-//console.log(Decompose.entries);
+if (genDecomposes){
+    Decompose.packRaw();
+    const decomposes=JSON.stringify(Decompose.entries,'',' ' );
+    if (writeChanged('decomposes.txt',decomposes)) {
+        console.log('written decomposes.txt',decomposes.length)
+    }
+}
+

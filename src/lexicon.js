@@ -16,6 +16,9 @@ export class Lexicon {
 	getDefs(entry) {
 		return this.entries[entry]
 	}
+	contains(entry) {
+		return !!this.entries[entry];
+	}
 	packRaw() {
 		this.packed=true;
 		for (let entry in this.entries) {

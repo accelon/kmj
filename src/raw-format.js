@@ -10,6 +10,19 @@ export const normalizeLemma=str=>{ //remove punc, space and 'n
 	const tk= m[0].toLowerCase().replace(/’+n/,'ṃ').replace(/’+$/,'');
 	return tk;
 }
+export const doRaw=(ctx,cb)=>{
+	const files=filesFromPattern('*.txt' , srcfolder);
+	files.forEach(fn=>{
+		ctx.fn=fn;
+	    const lines=readTextLines(srcfolder+fn);
+	    eachSentence(lines,ctx,cb);
+	});
+}
+
+export const normalizePali=str=>{
+	return str.toLowerCase().replace(/\[[^\]+]+\]/g,'')//dropping variants
+	.replace(/(’+)nti/g,'n$1ti');
+}
 
 export const parseRaw=lines=>{
     const out=[];

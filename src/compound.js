@@ -1,4 +1,4 @@
-import {TDenList,diffList} from 'pitaka/denote'
+import {TDenList,diffList,tokenizeIAST} from 'pitaka/denote'
 
 const findPart=(compounds,from,part)=>{
     for (let i=from;i<compounds.length;i++) {
@@ -28,6 +28,13 @@ const groupCompound=(compounds,parts)=>{
             .map(it=>(it.tk+(it.tail||'')).trim()).join('+'))
     }
     return out;
+}
+export const matchCompound=(str, lemmas, lexicon,ctx) =>{ 
+    const knownDecompose=ctx.knownDecompose;
+    const tokens=tokenizeIAST(str,{tokenOnly:true,removeBlank:true});
+    for (let i=0;i<tokens.length;i++) {
+        const tk=tokens[i];
+    }
 }
 let logcount=0;
 export const breakCompound=(str,str2,ctx)=>{
@@ -59,5 +66,17 @@ export const breakCompound=(str,str2,ctx)=>{
     }
     //if (logcount<10) console.log(out)
     //logcount++;
+    return out;
+}
+
+export const appendDecompose=(arr,out={})=>{
+    for (let i=0;i<arr.length;i++) {
+        const items=arr[i].split(',');
+        const compound=items.shift();
+        if (out[compound]) {
+            console.log('warning ',compound,'exists');
+        }
+        out[compound]=items;
+    }
     return out;
 }
