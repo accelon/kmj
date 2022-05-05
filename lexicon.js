@@ -1,7 +1,7 @@
 /* create a lexicon */
 import {kluer,nodefs,glob, writeChanged,filesFromPattern, readTextContent,patchBuf, readTextLines} from 'pitaka/cli';
 import {alphabetically0,alphabetically} from 'pitaka/utils'
-import {fromIAST,providently} from 'provident-pali'
+// import {fromIAST,providently} from 'provident-pali'
 await nodefs;
 import {eachSentence,eachDef} from './src/raw-format.js'; 
 import {Lexicon} from './src/lexicon.js'
@@ -38,9 +38,9 @@ writeChanged('sameas.json',JSON.stringify(SameAs,'',' '));
 console.log('packing');
 ctx.lexicon.packRaw();
 const lexicon=[];
-const provident_entries=[];
+const entries=[];
 for (let entry in ctx.lexicon.entries) {
-	provident_entries.push(fromIAST(entry));
+	entries.push(entry);
 	if (ctx.lexicon.entries[entry].length==1){
 		lexicon.push([entry,ctx.lexicon.entries[entry][0]]);
 	} else {
@@ -59,7 +59,7 @@ const output=JSON.stringify(out,'',' ');
 if (writeChanged('lexicon.json',output)) {
 	console.log('written lexicon.json',output.length);
 }
-provident_entries.sort(alphabetically)
-if (writeChanged('entries.txt',provident_entries.join('\n'))) {
-	console.log('written entries.txt',provident_entries.length);
+entries.sort(alphabetically)
+if (writeChanged('entries.txt',entries.join('\n'))) {
+	console.log('written entries.txt',entries.length);
 }

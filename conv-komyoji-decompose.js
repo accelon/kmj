@@ -1,7 +1,7 @@
 /* make use of legacy decompose-edit.txt */
 import {nodefs,readTextLines,readTextContent ,writeChanged} from 'pitaka/cli'
-import {unique,sortObj,toBase26} from 'pitaka/utils'
-import {fromIAST,lexify,stringifyLex} from 'provident-pali'
+import {unique,sortObj,toBase26,alphabetically} from 'pitaka/utils'
+import {fromIAST,lexify,stringifyLex,orthOf} from 'provident-pali'
 await nodefs;
 
 const srcfile="../../cap/komyoji/decompose-edit.txt" //https://github.com/dhamma/komyoji
@@ -12,8 +12,10 @@ const multilex=[];
 const lexemes={};
 const normalizeLex=str=>{
 	return str.replace('+++-jjh-','-')
+	.replace('=a-','=a')
+	// .replace(/\ba-/g,'a')
 	.replace('a-bb-++vy','a-vy')
-	.replace(/\-\+/g,'-').replace(/\+\-/g,'-').replace(/[\~~\?]/g,'').trim();
+	.replace(/\-\+/g,'-').replace(/\+\-/g,'-').replace(/[\~\?]/g,'').trim();
 }
 const normalizePart=str=>{
 	str=str.replace(/esu$/,'a')
@@ -27,8 +29,8 @@ const normalizePart=str=>{
 	if (str.match(/[svhgdbprtk]$/)) str+='a';
 	return str;
 }
-let sandhiless=0;
-const decompose_provident=[];
+let sandhiless=0,wrongorth=0;
+const decomp=[];
 const errordecompose=[];
 const packSandhiless=formula=>{
 	let s='',acc=0;
@@ -54,35 +56,41 @@ const processCompound=lines=>{
 
 		/* unique lexemes */
 		lexs.forEach((lex,idx)=>{
-				if (compound=='abbhāmattaṃva') console.log(compound,lex)
 
 			lex=normalizeLex(lex)
+			if (compound=='daṇḍādānasatthādānakalahaviggahavivādatuvaṃtuvaṃpesuññamusāvādā') {
+				console.log(compound,lex)
+			}
 			const parts=lex.split(/[\+\-\d]+/).filter(it=>it.length>1);//drop single char part -k- -p-
+			// if (compound=='anissaraṇapañño') console.log(compound,lex,parts, line)
 
+			if (parts.length==1) return; //only one part
 			if (idx==0) {
 				let formula=parts.map(fromIAST).join('-').replace('!','').replace('~','');
 				const w=fromIAST(compound);
-				if (formula.indexOf('??')>-1) {
-					console.log("wrong data",compound,parts)
-				} else {
-					if (w!==formula) {
-						if (formula.replace(/\-/g,'')==w) {
-							formula=packSandhiless(formula);
-							sandhiless++;
-							decompose_provident.push(w +'='+ formula );
 
-						} else {
-							const lex=lexify(w,formula.split('-'));
-							const wrongparts=lex.filter(it=>it==-1);
-							if (wrongparts.length) {
-								errordecompose.push(w+'='+formula+'!!'+lex.join('+'));
-							} else{
-								decompose_provident.push(w +'='+ stringifyLex(lex) );
+				if (w!==formula) {
+					const lex=lexify(w,formula.split('-'));
+					const wrongparts=lex.filter(it=>it==-1);
+					if (wrongparts.length) {
+						errordecompose.push(w+'='+formula+'!!'+lex.join('+'));
+					} else{
+						if (w!==orthOf(lex)) {
+							const at=w.match(/.[aeiou]/);
+							if (!at) {
+								wrongorth++;
+								// console.log('error orthOf lex',w,lex,formula)
+							} else {
+								// console.log('consist more than one word,',w,at[0])
+								// console.log(w,at);
 							}
+						} else {
+							decomp.push( compound +'='+ parts.join('-').replace('!','').replace('~','') ) ;
 						}
 					}
-					
- 				}
+				} else {
+					decomp.push( compound +'='+ parts.join('-') ) ;
+				}
 			}
 
 			parts.forEach(part=>{
@@ -96,10 +104,12 @@ const processCompound=lines=>{
 }
 
 
-
 let rawcontent=tidyUp(readTextContent(srcfile));
 const rawlines=rawcontent.split('\n');
 processCompound(rawlines);
+
+decomp.sort(alphabetically)
+
 const output=sortObj(lexemes)
 if (writeChanged('lexemes.txt',output.join('\n'))){
 	console.log('written lexemes',output.length)
@@ -107,10 +117,11 @@ if (writeChanged('lexemes.txt',output.join('\n'))){
 if (writeChanged('multilex.txt',multilex.join('\n'))){
 	console.log('multilex written',multilex.length)
 }
-if (writeChanged('decompose.txt',decompose_provident.join('\n'))){
-	console.log('decompose written',decompose_provident.length)
+if (writeChanged('decomp.txt',decomp.join('\n'))){
+	console.log('decomp written',decomp.length)
 }
 if (writeChanged('errordecompose.txt',errordecompose.join('\n'))){
 	console.log('errordecompose written',errordecompose.length)
 }
-console.log('sandhiless',sandhiless,'with sandhi',decompose_provident.length-sandhiless)
+// gconsole.log('sandhiless',sandhiless,'with sandhi',decompose_provident.length-sandhiless)
+console.log('wrong orth',wrongorth)
