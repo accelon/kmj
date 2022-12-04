@@ -1,6 +1,6 @@
-import {kluer,nodefs,glob, writeChanged, readTextContent,patchBuf} from 'pitaka/cli';
-import {entity2unicode} from 'pitaka/utils';
-import { cs, sc } from 'pitaka/meta';
+import { meta_cs, meta_sc, entity2unicode,nodefs, 
+	writeChanged, readTextContent,patchBuf} from 'ptk/nodebundle.cjs';
+import { yellow } from 'ptk/cli/colors.cjs';
 import {filesOf} from './src/kmj-folder.js'
 import HTMLErrata from './src/html-errata.js';
 await nodefs; //export fs to global
@@ -9,9 +9,9 @@ const desfolder='./raw/';
 
 if (!fs.existsSync(desfolder)) fs.mkdirSync(desfolder);
 const bkid=process.argv[2]||'m1';
-if (!process.argv[2]) console.log('file pattern',kluer.yellow('dn1~dn3, d1~d34, mn1~mn3, m1~m152, sn1~sn5, s1~s56, a1~a11'));
+if (!process.argv[2]) console.log('file pattern',yellow('dn1~dn3, d1~d34, mn1~mn3, m1~m152, sn1~sn5, s1~s56, a1~a11'));
 
-const books=sc.booksOf(bkid);
+const books=meta_sc.booksOf(bkid);
 const toPlainText=(content,fn)=>{
 	const at=content.indexOf('<script');
 	const out=[];
@@ -55,7 +55,5 @@ books.forEach(book=>{
 		const output=toPlainText(content,fn);
 		out.push(...output);
 	});
-	if (writeChanged(desfolder+book+'.txt',out.join('\n'))) {
-		console.log('written',book,out.length);
-	}
+	writeChanged(desfolder+book+'.txt',out.join('\n'),true);
 })

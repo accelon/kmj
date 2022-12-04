@@ -150,8 +150,7 @@ const MN_files=[[1,2],
 [18],      //150 continue mn15, not mn16
 [19],      //151
 [20,21,22]]  //152
-import { readTextContent} from 'pitaka/cli'
-import { sc } from 'pitaka/meta';
+import { meta_sc,readTextContent} from 'ptk/nodebundle.cjs'
 
 	
 export const filesFolders={
@@ -186,5 +185,5 @@ for (let i=1;i<=152;i++) {
 for (let i=1;i<=11;i++) filesFolders['a'+i]=['an/an'+i.toString().padStart(2,'0')+'c?'];
 
 
-export const filesOf=(pat,rootfolder)=>sc.getFilesOfBook(pat,filesFolders,rootfolder);
+export const filesOf=(pat,rootfolder)=>meta_sc.getFilesOfBook(pat,filesFolders,rootfolder);
 

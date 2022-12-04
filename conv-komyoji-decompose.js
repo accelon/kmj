@@ -1,7 +1,7 @@
 /* make use of legacy decompose-edit.txt */
 import {nodefs,readTextLines,readTextContent ,writeChanged} from 'pitaka/cli'
 import {unique,sortObj,toBase26,alphabetically} from 'pitaka/utils'
-import {fromIAST,lexify,stringifyLex,orthOf} from 'provident-pali'
+import {fromIAST,lexify,orthOf} from 'provident-pali'
 await nodefs;
 
 const srcfile="../../cap/komyoji/decompose-edit.txt" //https://github.com/dhamma/komyoji

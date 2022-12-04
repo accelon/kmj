@@ -1,4 +1,4 @@
-import {TDenList,diffList,tokenizeIAST} from 'pitaka/denote'
+import {TDenList,diffList,tokenizeIAST} from 'ptk/nodebundle.cjs'
 
 const findPart=(compounds,from,part)=>{
     for (let i=from;i<compounds.length;i++) {

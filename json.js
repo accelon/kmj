@@ -1,8 +1,9 @@
-import {kluer,nodefs,glob, writeChanged,filesFromPattern, readTextContent,patchBuf, readTextLines} from 'pitaka/cli';
+import {nodefs,writeChanged,filesFromPattern, readTextContent
+    , readTextLines} from 'ptk/nodebundle.cjs';
 import {Lexicon} from './src/lexicon.js';
+import {TDenList,diffList} from 'ptk/nodebundle.cjs'
 import {eachDef, eachSentence} from './src/raw-format.js'; 
-import {TDenList,diffList} from 'pitaka/denote'
-import {breakCompound,matchCompound,loadKnownDecompose} from './src/compound.js'
+import {breakCompound,matchCompound} from './src/compound.js'
 
 await nodefs; //export fs to global
 const srcfolder='./raw/'
@@ -11,6 +12,7 @@ const desfolder='./json/'
 if (!fs.existsSync(desfolder)) fs.mkdirSync(desfolder);
 const SameAs=JSON.parse(readTextContent('sameas.json')); //有 "同上" 的lemma, lexicon.js 產生
 const files=filesFromPattern( process.argv[2]+'.txt' , srcfolder);
+if (!files.length) console.log('missing pattern')
 const lexicon=new Lexicon( JSON.parse( readTextContent('./lexicon.json')));
 const ctx={};
 
@@ -119,11 +121,12 @@ const isIdentical=(rawdefs,ctx)=>{
 
 const isNormalDef=rawdef=>rawdef.indexOf('\t')>-1;
 let errcount=0;
-const genDecomposes=false; //產生decomposes.txt ，供validdecompose.js找出可能的拆分
-ctx.knownDecompose=loadKnownDecompose( readTextLines('./knowndecompose.txt'));
+const genDecomposes=true; //產生decomposes.txt ，供validdecompose.js找出可能的拆分
+// ctx.knownDecompose=loadKnownDecompose( readTextLines('./knowndecompose.txt'));
 
 
 files.forEach(fn=>{
+
     const out=[];
     const lines=readTextLines(srcfolder+fn);
     //lines.length=114;
@@ -183,16 +186,12 @@ files.forEach(fn=>{
     })
     const outfn=desfolder+fn.replace('.txt','.json');
     const outcontent=JSON.stringify(out,'',' ');
-    if (writeChanged(outfn,outcontent)) {
-        console.log('written',outfn,outcontent.length)
-    }
+    writeChanged(outfn,outcontent,true)
 })
 
 if (genDecomposes){
     Decompose.packRaw();
     const decomposes=JSON.stringify(Decompose.entries,'',' ' );
-    if (writeChanged('decomposes.txt',decomposes)) {
-        console.log('written decomposes.txt',decomposes.length)
-    }
+    writeChanged('decomposes.txt',decomposes,true)
 }
 

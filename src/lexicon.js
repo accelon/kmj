@@ -1,4 +1,4 @@
-﻿import {sortObj} from 'pitaka/utils'
+﻿import {sortObj} from 'ptk/nodebundle.cjs'
 export class Lexicon {
 	constructor (json) {
 		this.entries={};

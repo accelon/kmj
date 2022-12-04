@@ -1,6 +1,6 @@
 /* create a lexicon */
-import {kluer,nodefs,glob, writeChanged,filesFromPattern, readTextContent,patchBuf, readTextLines} from 'pitaka/cli';
-import {alphabetically0,alphabetically} from 'pitaka/utils'
+import {nodefs,glob, writeChanged,filesFromPattern, alphabetically0,alphabetically,
+	patchBuf, readTextLines} from 'ptk/nodebundle.cjs';
 // import {fromIAST,providently} from 'provident-pali'
 await nodefs;
 import {eachSentence,eachDef} from './src/raw-format.js'; 
@@ -56,10 +56,6 @@ for (let i=0;i<lexicon.length;i++) {
 	out[entry]=defs;
 }
 const output=JSON.stringify(out,'',' ');
-if (writeChanged('lexicon.json',output)) {
-	console.log('written lexicon.json',output.length);
-}
+writeChanged('lexicon.json',output,true);
 entries.sort(alphabetically)
-if (writeChanged('entries.txt',entries.join('\n'))) {
-	console.log('written entries.txt',entries.length);
-}
+writeChanged('entries.txt',entries.join('\n'),true)
