@@ -1,9 +1,11 @@
 import {readTextLines,readTextContent,writeChanged} from 'ptk/nodebundle.cjs'
-
+import iconv from 'iconv-lite'
 export const host='https://komyojikyozo.web.fc2.com/'
-export const sjis2utf8=buf=>{
-    const decoder = new TextDecoder('shift_jis');
-    const r = decoder.decode(buf);
+export const sjis2utf8=arraybuf=>{
+    const buf=Buffer.from(arraybuf);
+    const r=iconv.decode(buf,'shiftjis')
+    //const decoder = new TextDecoder('shift_jis');
+    //const r = decoder.decode(buf);
     return r;
 }
 

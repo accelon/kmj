@@ -17,7 +17,7 @@ const downloadfile=async f=>{
     }
     const remotefilename=filename.replace('.htm','')+'.files/sheet001.htm';
     const res=await fetch(host+remotefilename);
-    const text=sjis2utf8 (await res.arrayBuffer());
+    const text=sjis2utf8 (await res.arrayBuffer()).replace('shift_jis','utf8');
     writeChanged(localfilename,text,true);
 }
 for (let i=0;i<filelist.length;i++) {

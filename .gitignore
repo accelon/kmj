@@ -6,3 +6,4 @@ json
 *.json
 *.html
 *.cmd
+node_modules
