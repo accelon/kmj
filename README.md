@@ -2,7 +2,8 @@
 komyoji html to offtext
 
 ## prerequisite
-download all html files from komyoji and convert SJIS to Utf-8
+node crawl.js [pat]
+pat: dn,mn,sn,an,kn
 
 ## steps
 
