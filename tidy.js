@@ -33,7 +33,7 @@ const toPlainText=(content,fn)=>{
 		const m=line.match(/^([\d\-]+)\.$/);
 		if (m) {out.push('^n'+m[1]);prefix='㊣';continue;}
 		const first5=line.slice(0,5);
-		if (line==='訳文') {prefix='㉆'; continue;}
+		if (line==='訳文'||line==='訳文 文') {prefix='㉆'; continue;}
 		if (line==='メモ') {prefix='㊟'; continue;}
 		if (first5==='語	語根	') {prefix='㊔';continue;}	
 		if (first5==='述語	語根') {prefix='㊒';continue;}
@@ -51,7 +51,8 @@ books.forEach(book=>{
 	const files=filesOf(book,srcfolder);
 	const out=[];
 	files.forEach(fn=>{
-		let content=patchBuf(readTextContent(srcfolder+fn),HTMLErrata[fn]);
+		const errata=HTMLErrata[fn];
+		let content=patchBuf(readTextContent(srcfolder+fn),errata);
 		const output=toPlainText(content,fn);
 		out.push(...output);
 	});

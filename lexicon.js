@@ -8,7 +8,9 @@ import {Lexicon} from './src/lexicon.js'
 
 const srcfolder='./raw/'
 
-const files=filesFromPattern('n?',srcfolder);
+const files=filesFromPattern('?',srcfolder);
+console.log('file count',files.length)
+
 const ctx={lexicon:new Lexicon() };
 
 console.log('building lexicon');

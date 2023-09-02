@@ -2,7 +2,7 @@
 import {nodefs,writeChanged} from 'ptk/nodebundle.cjs'
 await nodefs;
 const desfolder='html/';
-const pat=process.argv[2]||'dn';
+const pat=process.argv[2]||'dn01';
 import {getFileList,host,sjis2utf8} from './src/crawlfile.js'
 
 const filelist=(await getFileList()).filter(it=>it.startsWith(pat));

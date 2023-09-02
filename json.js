@@ -8,10 +8,10 @@ import {breakCompound,matchCompound} from './src/compound.js'
 await nodefs; //export fs to global
 const srcfolder='./raw/'
 const desfolder='./json/'
-
+const pat=process.argv[2]||'dn?';
 if (!fs.existsSync(desfolder)) fs.mkdirSync(desfolder);
 const SameAs=JSON.parse(readTextContent('sameas.json')); //有 "同上" 的lemma, lexicon.js 產生
-const files=filesFromPattern( process.argv[2]+'.txt' , srcfolder);
+const files=filesFromPattern( pat+'.txt' , srcfolder);
 if (!files.length) console.log('missing pattern')
 const lexicon=new Lexicon( JSON.parse( readTextContent('./lexicon.json')));
 const ctx={};
