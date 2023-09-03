@@ -2,7 +2,7 @@
 import { meta_sc, nodefs, writeChanged, readTextLines,readTextContent,patchBuf} from 'ptk/nodebundle.cjs';
 import {eachDef, eachSentence,isIdenticalGrammar,isNormalDef,parseNormalDef,reuseLemmas} from './src/raw-format.js'; 
 import {Lexicon} from './src/lexicon.js';
-import {rawpatches} from './src/rawpatch.js'
+import {rawpatches,reuselemmadecomp} from './src/rawpatch.js'
 import {pnpatches} from './src/pnpatch.js'
 await nodefs; //export fs to global
 
@@ -18,7 +18,7 @@ console.log('books',books)
 const SameAs=JSON.parse(readTextContent('sameas.json')); //有 "同上" 的lemma, lexicon.js 產生
 const lexicon=new Lexicon( JSON.parse( readTextContent('lexicon.json')));
 
-const ctx={lexicon,SameAs,pnlemmas:{}};
+const ctx={lexicon,SameAs,pnlemmas:{},reuselemmadecomp};
 const addLemmas=(id,lex)=>{
     if (!ctx.pnlemmas[id]) ctx.pnlemmas[id]=lex;
     else {

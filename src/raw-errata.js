@@ -79,5 +79,5 @@ export const DefPatch={
 	'sn3_347-10':{'carāma':'car	動	現	能	複	一	行ずる'},
 	'an7_72-90':bhavissati,
 	'an10_111-6':{'asekhāya':'a-śikṣ	名	a	女	単	具	無学'},
-		
+			
 }

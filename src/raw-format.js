@@ -2,6 +2,27 @@ import {LemmaPatch,DefPatch} from './raw-errata.js'
 import { TDenList } from 'ptk/nodebundle.cjs';
 export const LEMMA_REGEX=/([abcdeghijklmnoprstuvyāīūḍṭṇñḷṃṣṅ]+)/ig;
 export const isNormalDef=rawdef=>rawdef.indexOf('\t')>-1;
+
+export const localDecomp=(lemma,lexicon)=>{ //very simple decompose using local lexicon
+	if (lemma=='-') return [];
+	if (lemma=='nti'||lemma=='va'||lemma=='ti'||lemma=='pe'||lemma=='kareyya'||lemma=='hoti') return [lemma];
+	const out=[];
+	let remain=lemma,found=false;
+	while (remain.length) {
+		found=false;
+		for (let i=0;i<lexicon.length;i++) {
+			if (!lexicon[i]) continue;
+			const lex=lexicon[i].replace(/\d+$/,'');
+			if (remain.startsWith(lex)) {
+				out.push(lexicon[i])
+				remain=remain.slice(lex.length);
+				found=true;
+			}
+		}
+		if (!found) break;
+	}
+	return remain.length>0?null:out;
+}
 export const normalizeLemma=str=>{ //remove punc, space and 'n
 	const m=str.match(LEMMA_REGEX)
 	if (!m) {
@@ -100,11 +121,14 @@ export const parseNormalDef=(rawdef,ctx)=>{
 			if (entry.match(/[īāū]$/)) {
 				entry=entry.replace(/ī$/,'i').replace(/ā$/,'a').replace(/ū$/,'u');
 				defs=ctx.lexicon.getDefs(entry);
+			} 
+			if (!defs && ~rawdef.indexOf('’n')) { //append ṃ
+				defs=ctx.lexicon.getDefs(entry+'ṃ');
 			}
 		}
 
 		if (!defs) { 
-			console.log('entry not found',entry,ctx.pn)
+			console.log('entry not found',entry,ctx.pn,rawdef,normalizeLemma(rawdef))
 			return;
 		}
 
@@ -155,7 +179,9 @@ let errcount=0;
 export const reuseLemmas=(rawdef,lemmas,j,ctx)=>{
     let newj=j;//consumed following rawdefs
     const found=[];
+	
     const reuse=new TDenList(rawdef,{akey:'reuse',lang:'iast'});
+	
     //if (debug) console.log(lemmas)
     for (let i=0;i<reuse.data.length;i++){
         const lemma=reuse.data[i].tk;
@@ -171,9 +197,29 @@ export const reuseLemmas=(rawdef,lemmas,j,ctx)=>{
                 if (at>j) {
                     found.push(ctx.locallex[at])
                     newj=at;
-                } else {                
-                    if (errcount<10) console.log('unknown reuse lemma:',ctx.fnpf+'_'+ctx.pn,reuse.data[i].tk);
-                    errcount++;
+                } else {       
+					//先試簡單拆分，省去建 reuselemmadecomp 表
+					const localdecomposed=localDecomp(lemma,ctx.locallex);
+					if (localdecomposed) {
+						found.push(...localdecomposed)
+					} else {
+						if (ctx.reuselemmadecomp[lemma]) {
+							for (let i=0;i<ctx.reuselemmadecomp[lemma].length;i++) {
+								const sublem=ctx.reuselemmadecomp[lemma][i];
+								const at=findLemma(ctx.locallex,sublem,newj); //look ahead
+								if (~at) {
+									found.push(ctx.locallex[at]);
+								} else {
+									console.log('unknown reuse lemma(broken)',sublem,lemma,ctx.pn)
+								}
+							}
+						} else {
+							if (errcount<100) {
+								console.log('unknown reuse lemma:',ctx.fnpf+'_'+ctx.pn,lemma);
+							}
+							errcount++;	
+						}
+					}
                 }
             }
         }
