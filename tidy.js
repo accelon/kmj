@@ -8,13 +8,13 @@ const srcfolder='./html/';
 const desfolder='./raw/';
 
 if (!fs.existsSync(desfolder)) fs.mkdirSync(desfolder);
-const bkid=process.argv[2]||'m1';
+const bkid=process.argv[2]||'dn1';
 if (!process.argv[2]) console.log('file pattern',yellow('dn1~dn3, d1~d34, mn1~mn3, m1~m152, sn1~sn5, s1~s56, a1~a11'));
 
 const books=meta_sc.booksOf(bkid);
 const toPlainText=(content,fn)=>{
 	const at=content.indexOf('<script');
-	const out=[];
+	const out=['㊑'+fn]; //加上檔名比較好找
 	content=content.slice(0,at);
 
 	content=entity2unicode(content);
