@@ -1,33 +1,15 @@
 import {LemmaPatch,DefPatch} from './raw-errata.js'
-import { TDenList } from 'ptk/nodebundle.cjs';
+import { TDenList,tokenize } from 'ptk/nodebundle.cjs';
+import {pnpatches} from './pnpatch.js'
+import {breakCompound} from './compound.js'
 export const LEMMA_REGEX=/([abcdeghijklmnoprstuvyāīūḍṭṇñḷṃṣṅ]+)/ig;
-export const isNormalDef=rawdef=>rawdef.indexOf('\t')>-1;
+export const isNormalDef=rawdef=>(rawdef||'').indexOf('\t')>-1;
+const skipwords=['nti','va','ti','pe','kareyya','hoti'];
 
-export const localDecomp=(lemma,lexicon)=>{ //very simple decompose using local lexicon
-	if (lemma=='-') return [];
-	if (lemma=='nti'||lemma=='va'||lemma=='ti'||lemma=='pe'||lemma=='kareyya'||lemma=='hoti') return [lemma];
-	const out=[];
-	let remain=lemma,found=false;
-	while (remain.length) {
-		found=false;
-		for (let i=0;i<lexicon.length;i++) {
-			if (!lexicon[i]) continue;
-			const lex=lexicon[i].replace(/\d+$/,'');
-			if (remain.startsWith(lex)) {
-				out.push(lexicon[i])
-				remain=remain.slice(lex.length);
-				found=true;
-			}
-		}
-		if (!found) break;
-	}
-	return remain.length>0?null:out;
-}
 export const normalizeLemma=str=>{ //remove punc, space and 'n
-	const m=str.match(LEMMA_REGEX)
+	const m=str.match(LEMMA_REGEX);
 	if (!m) {
-		console.log("invalid lemma",str);
-		return '';
+		return null;
 	}
 	const tk= m[0].toLowerCase().replace(/’+n/,'ṃ').replace(/’+$/,'');
 	return tk;
@@ -48,34 +30,48 @@ export const normalizePali=str=>{
 
 export const parseRaw=lines=>{
     const out=[];
-    let ppn='',pn='',defs=[],pali='',jp='',memo='',fn='';
-    const addEntry=()=>{
-        out.push({pali,pn:ppn,defs,memo,jp,fn});
-        ppn=pn,pali='',memo='', jp='',  defs=[];
-    }
-    for (let i=0;i<lines.length;i++){
-        const line=lines[i];
-        const first=line.charAt(0);
-        if (line.slice(0,2)=='^n') {
-            pn=line.slice(2);
-            continue;
-        } else if (first==='㊣') {
-            if (pali) addEntry( pali, defs);
-            pali=line.slice(1);
-        } else if (first==='㊔'||first==='㊒') {
-            defs.push(line.slice(1));
-        } else if (first==='㉆') {
-            jp=line.slice(1);
-        } else if (first==='㊟') {
-            memo+=line.slice(1);
-        } else if (first==='㊑') {
-            fn=line.slice(1);
-        }  else {
-            console.log('line',i,line)
-            throw 'unknown line type '
-        }
+	let context={memo:'',fn:'',defs:[],pali:''};
 
+	const groups={};
+	let thegroup=[];
+	for (let i=0;i<lines.length;i++){
+		const line=lines[i];
+		if (line.slice(0,2)=='^n') {
+			thegroup=[];
+			groups[line.slice(2)]=thegroup;
+		} else {
+			thegroup.push(line)
+		}
+	}
+
+	const addEntry=pn=>{
+		if (context.pali) out.push(context);
+		context=Object.assign({pn,memo:'',fn:'',defs:[],pali:''});
     }
+
+    for (let pn in groups){
+		const lines=groups[pn];
+		for (let i=0;i<lines.length;i++) {
+			const line=lines[i];
+			const first=line.charAt(0);
+			if (first==='㊣') {
+				addEntry(pn);
+				context.pali=line.slice(1);
+			} else if (first==='㊔'||first==='㊒') {
+				context.defs.push(line.slice(1));
+			} else if (first==='㉆') {
+				context.jp=line.slice(1);
+			} else if (first==='㊟') {
+				context.memo+=line.slice(1);
+			} else if (first==='㊑') {
+				context.fn=line.slice(1);
+			}  else {
+				console.log('line',i,line)
+				throw 'unknown line type '
+			}
+		}
+	}
+	addEntry();
     return out;
 }
 
@@ -90,72 +86,70 @@ export const eachSentence=(lines,ctx,cb)=>{
 		cb(pn,pali,defs);
 	}
 }
-export const eachDef=(str,ctx,cb)=>{
+export const patchDef=(str,ctx)=>{
 	const at=str.indexOf('\t');
 	let err=false;
+	let entry='',def='';
 	if (at==-1) { //expansion
 		err=true;
 	} else {
-		let entry=normalizeLemma(str.slice(0,at));
+		entry=normalizeLemma(str.slice(0,at));
 		//if (ctx.pn=='171-2') console.log(ctx.pn,entry,ctx.lemmapatch)
 		if (ctx.lemmapatch&&ctx.lemmapatch[entry]) {
 			// console.log('patch lemma',entry,ctx.lemmapatch[entry]);
 			entry=ctx.lemmapatch[entry];
 		}
-		let def=str.slice(at+1);
+		def=str.slice(at+1);
 		if (ctx.defpatch&&ctx.defpatch[entry]) {
 			def=ctx.defpatch[entry];
 		}
 		if (def.indexOf('\t')==-1 && def!=='同上') err=true;
-		else cb(entry,def);
 	}
-	if (err) console.log('error def',ctx.fn,ctx.pn,str)
+	return [err,entry,def];
 }
 
+const parseReferences=(rawdef,ctx)=>{
+	const out=[]
+	let pn='';
+	if (rawdef.indexOf('(')) {
+		rawdef.replace(/(\d+)(\-?)/g,(m,m1,m2)=>{
+			if (m2=='-') {
+				pn=m1;
+			} else {
+				out.push(pn+'-'+m1);
+			}
+		});
+	};
+	return out;
+}
 export const parseNormalDef=(rawdef,ctx)=>{
     const out=[];
-    eachDef(rawdef,ctx,(entry,def)=>{
+    let [err,entry,def]=patchDef(rawdef,ctx);
 
-        let defs=ctx.lexicon.getDefs(entry);
-        if (!defs) { //查無此詞, 試試去掉結尾長音
-			if (entry.match(/[īāū]$/)) {
-				entry=entry.replace(/ī$/,'i').replace(/ā$/,'a').replace(/ū$/,'u');
-				defs=ctx.lexicon.getDefs(entry);
-			} 
-			if (!defs && ~rawdef.indexOf('’n')) { //append ṃ
-				defs=ctx.lexicon.getDefs(entry+'ṃ');
-			}
+	let defs=ctx.lexicon.getDefs(entry);
+	if (!defs) { //查無此詞, 試試去掉結尾長音
+		if (entry.match(/[īāū]$/)) {
+			entry=entry.replace(/ī$/,'i').replace(/ā$/,'a').replace(/ū$/,'u');
+			defs=ctx.lexicon.getDefs(entry);
+		} 
+		if (!defs && ~rawdef.indexOf('’n')) { //append ṃ
+			defs=ctx.lexicon.getDefs(entry+'ṃ');
 		}
-
-		if (!defs) { 
-			console.log('entry not found',entry,ctx.pn,rawdef,normalizeLemma(rawdef))
-			return;
+	}
+	if (!defs) { 
+		return [entry];
+	}
+	if (def=='同上') {
+		//SameAs 一開始是數字。然後不斷更新為最新的定義
+		if (!ctx.SameAs[entry])console.log('cannot find 同上 for entry',entry,'in',ctx.pn);
+		def=ctx.SameAs[entry];//取最接近的定義
+		if (typeof def!=='string') {// 之前沒出現過，只好用第一組定義
+			def=defs[0]; //直接用第一組定義
 		}
-
-	    if (def=='同上') {
-			//SameAs 一開始是數字。然後不斷更新為最新的定義
-            if (!ctx.SameAs[entry])console.log('cannot find 同上 for entry',entry,'in',ctx.pn);
-			def=ctx.SameAs[entry];//取最接近的定義
-			if (typeof def!=='string') {// 之前沒出現過，只好用第一組定義
-				def=defs[0]; //直接用第一組定義
-			}
-		} else {
-			ctx.SameAs[entry]=def;//記錄最接近的定義
-		}
-
-		if (defs.length===1) {
-			if (defs[0]==def) out.push(entry);
-			else console.log(entry,'single sense not match',def);
-		} else {
-			let sense=defs.indexOf(def);
-			if (sense==-1){
-				console.log(entry,'sense not found',ctx.pn,def)
-			} else {
-				out.push(entry+(sense?sense:''));
-			}                    
-		}
-    })
-    return out;
+	} else {
+		ctx.SameAs[entry]=def;//記錄最接近的定義
+	}
+    return [entry,def];
 }
 const findLemma=(lemmas,entry,from=0,debug)=>{
     let at=lemmas.lastIndexOf(entry);
@@ -167,14 +161,6 @@ const findLemma=(lemmas,entry,from=0,debug)=>{
     return -1;
 }
 
-const diff=(str,  expanded, replaces )=>{
-    const vri=new TDenList(str,{akey:'vri',lang:'iast'});
-    const reuse=new TDenList(expanded,{akey:'reuse',lang:'iast'});
-
-    const d=diffList(vri,reuse);
-    //console.log(d.filter(it=>it.m),replaces)
-}
-
 let errcount=0;
 export const reuseLemmas=(rawdef,lemmas,j,ctx)=>{
     let newj=j;//consumed following rawdefs
@@ -182,7 +168,6 @@ export const reuseLemmas=(rawdef,lemmas,j,ctx)=>{
 	
     const reuse=new TDenList(rawdef,{akey:'reuse',lang:'iast'});
 	
-    //if (debug) console.log(lemmas)
     for (let i=0;i<reuse.data.length;i++){
         const lemma=reuse.data[i].tk;
         const at=findLemma(lemmas,lemma);        
@@ -224,16 +209,91 @@ export const reuseLemmas=(rawdef,lemmas,j,ctx)=>{
             }
         }
     }
-    //if (found.length) console.log(found,rawdef)
     lemmas.push(...found);
     return newj;
 }
 
-export const isIdenticalGrammar=(rawdefs,ctx)=>{
-    if (rawdefs.length==1) {
-        const m=rawdefs[0].match(/\((\d+\-\d+)\.\)/);
-        if (m) {
-            return m[1];
-        }
-    }
+
+
+export const dumpGrammar=(lines,ctx,cb)=>{
+	if (!ctx.stat) ctx.stat={total:0,ambigous:0,miss:0};
+	const emit=(a1,a2,a3,a4,a5)=>{
+
+		if (cb) {
+			cb(a1,a2,a3,a4,a5);
+		} else if (ctx.onData) {
+			ctx.onData(a1,a2,a3,a4,a5)
+		}
+	}
+	eachSentence(lines,ctx,(pn,pali,rawdefs)=>{
+		pali=pali.replace(/\[[^\]]+\]/g,''); //remove note
+
+		const defs=[],lemmas=[];
+		const patchkey=ctx.fn+'_'+pn;
+		let consumed=0;
+		for (let i=0;i<rawdefs.length;i++) {
+			const [lemma,def]=parseNormalDef(rawdefs[i],ctx);
+			if (!def) { //
+				const references=parseReferences(rawdefs[i]);
+				for (let j=0;j<references.length;j++) {
+					let  lex=ctx.pnLexicon[references[j]];
+
+					if (!lex) {
+						const pnpatch=pnpatches[patchkey];
+						if (pnpatch) {
+							if (pnpatch && pnpatch[references[j]]){
+								const newpn=pnpatch[references[j]];
+								lex=ctx.pnLexicon[newpn];
+							}
+						}
+					}
+					if (!lex){
+						console.log('unknown reference',references[j]);
+					} else {
+						lemmas.push(...lex.lemmas);
+						defs.push(...lex.defs);
+					}
+				}
+			} else {
+				lemmas.push(lemma);
+				defs.push(def);
+			}
+		}
+		ctx.pnLexicon[pn]={lemmas,defs};
+		
+		const decomposed=breakCompound(pali, lemmas, ctx.knownDecompose);
+		const tokens=tokenize(pali);
+	
+		for (let i=0;i<tokens.length;i++) { 
+			const tk=normalizeLemma(tokens[i].text);
+			if (!tk) {
+				emit(pn,i,tokens[i].text,tokens[i].text);//as it is
+				continue;
+			}
+			ctx.stat.total++;
+			let at1=lemmas.indexOf(tk,consumed);
+			if (!~at1) {				
+				at1=lemmas.indexOf(tk); //重頭找
+			}
+			
+			if (!~at1) { //not found , try decomposed            
+				const at3=decomposed[tk];
+				if (at3) {
+					for (let j=0;j<decomposed[tk].length;j++) {
+						const at4=lemmas.indexOf(decomposed[tk][j]);
+						emit(pn, i, j==0?tokens[i].text:'', decomposed[tk][j], defs[at4])
+					}
+				} else {
+					if (!~skipwords.indexOf(tk)) {
+						ctx.stat.miss++;
+						console.log('miss',pn,tokens[i].text)
+					}
+					emit(pn,i,tokens[i].text);
+				}
+			} else {
+				emit(pn,i ,tokens[i].text, tk, defs[at1]);
+				consumed=at1;
+			}
+		}
+	})
 }

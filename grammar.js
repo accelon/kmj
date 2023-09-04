@@ -19,24 +19,26 @@ const SameAs=JSON.parse(readTextContent('sameas.json')); //有 "同上" 的lemma
 const lexicon=new Lexicon( JSON.parse( readTextContent('lexicon.json')));
 
 const ctx={lexicon,SameAs,pnlemmas:{},reuselemmadecomp};
-const addLemmas=(id,lex)=>{
-    if (!ctx.pnlemmas[id]) ctx.pnlemmas[id]=lex;
+const addLemmas=(id,lex_def)=>{
+    if (!ctx.pnlemmas[id]) ctx.pnlemmas[id]=lex_def;
     else {
         let count=0,newid=id;
         while (ctx.pnlemmas[newid]) {
             newid=id+'.'+(++count);
         }
-        ctx.pnlemmas[newid]=lex;
+        ctx.pnlemmas[newid]=lex_def;
     }
 }
-//
 
+
+/*
 books.forEach(book=>{	
 	const lines=readTextLines(srcfolder+book+'.txt');
     ctx.fn=book;
 	
 	eachSentence(lines,ctx,(pn,pali,rawdefs)=>{
 		let j=0, done =false;
+        
 		const locallex=[],lemmas=[];
 		ctx.locallex=locallex;
 		ctx.pn=pn;
@@ -93,5 +95,7 @@ books.forEach(book=>{
 
 		addLemmas(ctx.fnpf+'_'+pn,lemmas);
 		//console.log(pn,pali,rawdefs)
+        console.log(lemmas)
 	});
 });
+*/

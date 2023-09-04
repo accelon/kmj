@@ -12,7 +12,11 @@ const bkid=process.argv[2]||'dn1';
 if (!process.argv[2]) console.log('file pattern',yellow('dn1~dn3, d1~d34, mn1~mn3, m1~m152, sn1~sn5, s1~s56, a1~a11'));
 
 const books=meta_sc.booksOf(bkid);
+const tidypali=str=>{
+	return str.replace(/‘‘/g,'“').replace(/’’/g,'”')
+}
 const toPlainText=(content,fn)=>{
+	content=tidypali(content)
 	const at=content.indexOf('<script');
 	const out=['㊑'+fn]; //加上檔名比較好找
 	content=content.slice(0,at);

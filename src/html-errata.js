@@ -14,5 +14,10 @@
 		['n&#257;</font><font class="font14">nus&#257;si','na</font> <font class="font14">anus&#257;si'],
 		['n&#257;</font><font class="font14">bhisambhosi','na</font> <font class="font14">abhisambhosi'],
 	],
+	"dn/dn04c05.htm":[ //應有22 句，311-1 重覆
+		["311-21.","311-22."],
+		[">311-1.",">311-21.",2], //將二次出現的 311-1 改為 311-21
+		[">311-21",">311-1"], //將第一次出現的改回改回 311-1
+	]
 
 }
