@@ -1,6 +1,8 @@
-import {LemmaPatch,DefPatch} from './raw-errata.js'
+import {LemmaPatch,DefPatch,RawDefPatch} from './raw-errata.js'
 import { TDenList,tokenize } from 'ptk/nodebundle.cjs';
 import {pnpatches} from './pnpatch.js'
+//
+
 import {breakCompound} from './compound.js'
 export const LEMMA_REGEX=/([abcdeghijklmnoprstuvyāīūḍṭṇñḷṃṣṅ]+)/ig;
 export const isNormalDef=rawdef=>(rawdef||'').indexOf('\t')>-1;
@@ -30,19 +32,24 @@ export const normalizePali=str=>{
 
 export const parseRaw=lines=>{
     const out=[];
-	let context={memo:'',fn:'',defs:[],pali:''};
+	let context={memo:'',htmlfn:'',defs:[],pali:''};
 
 	const groups={};
-	let thegroup=[];
+	let thegroup=[],pn='1-0';
 	for (let i=0;i<lines.length;i++){
 		const line=lines[i];
 		if (line.slice(0,2)=='^n') {
+			if (thegroup.length) {
+				groups[pn]=thegroup;
+			}
 			thegroup=[];
 			groups[line.slice(2)]=thegroup;
+			pn=line.slice(2)
 		} else {
 			thegroup.push(line)
 		}
 	}
+	
 
 	const addEntry=pn=>{
 		if (context.pali) out.push(context);
@@ -64,7 +71,7 @@ export const parseRaw=lines=>{
 			} else if (first==='㊟') {
 				context.memo+=line.slice(1);
 			} else if (first==='㊑') {
-				context.fn=line.slice(1);
+				context.htmlfn=line.slice(1);
 			}  else {
 				console.log('line',i,line)
 				throw 'unknown line type '
@@ -74,15 +81,30 @@ export const parseRaw=lines=>{
 	addEntry();
     return out;
 }
-
+export const patchRawDef=(line,patches)=>{
+	if (!patches||!patches.length||!line) return line;
+	for (let i=0;i<patches.length;i++) {
+		if (line==patches[i][0]) {
+			line=patches[i][1];
+			if (patches[i][2]) {
+				patches[i][2]--;
+			} else {
+				patches[i][0]='';
+			}
+		}
+	}
+	return line;
+}
 export const eachSentence=(lines,ctx,cb)=>{
 	const out=parseRaw(lines);
 	ctx.fnpf=ctx.fn.replace(/\..+$/,'');
 	for (let i=0;i<out.length;i++) {
-		const {pn,defs,pali}=out[i];
-		ctx.pn=pn;
-		ctx.defpatch=DefPatch[ctx.fnpf+'_'+pn];
-		ctx.lemmapatch=LemmaPatch[ctx.fnpf+'_'+pn];
+		const {pn,defs,pali,htmlfn}=out[i];
+		const patchkey=ctx.fnpf+'_'+pn;
+		ctx.pn=pn||'1-0';
+		ctx.defpatch=DefPatch[patchkey];
+		ctx.lemmapatch=LemmaPatch[patchkey];
+		ctx.htmlfn=htmlfn;
 		cb(pn,pali,defs);
 	}
 }
@@ -105,6 +127,7 @@ export const patchDef=(str,ctx)=>{
 		}
 		if (def.indexOf('\t')==-1 && def!=='同上') err=true;
 	}
+	
 	return [err,entry,def];
 }
 
@@ -112,19 +135,44 @@ const parseReferences=(rawdef,ctx)=>{
 	const out=[]
 	let pn='';
 	if (rawdef.indexOf('(')) {
-		rawdef.replace(/(\d+)(\-?)/g,(m,m1,m2)=>{
-			if (m2=='-') {
-				pn=m1;
+		rawdef.replace(/([\d+\-]{2,})/g,(m,m1)=>{
+			const at=m1.indexOf('-')
+			if (~at) {
+				out.push(m1);
+				pn=m1.slice(0,at);
 			} else {
+				if (!pn) return ;//not a reference, leading paranum.
 				out.push(pn+'-'+m1);
 			}
 		});
 	};
 	return out;
 }
-export const parseNormalDef=(rawdef,ctx)=>{
+export const tidyDefLine=(defline,ctx)=>{
+	const def=defline.split('\t');
+	const lemma=def.shift();
+	if (def.length==6) {
+		def[6]=def[5];//move meaning to end
+		const m=def[4].match(/[\(（〔](.+)[\)）〕]/);
+		if (m) {
+			def[5]='（'+m[1]+'）'
+			def[4]=def[4].slice(0,m.index);
+		} else {
+			//console.log('wrong subcase format',def[4],ctx.pn)
+			def[5]=def[4];
+			def[4]='合';//複合詞的組成部份，單復數在最後一個部份
+		}
+		
+	} else if (def.length!=7 && def.length!==1 && def.length!==2) {
+		console.log('wrong def length',def.length,ctx.pn,def)
+	}
+	def.unshift(lemma);
+	
+	return def.join('\t')
+}
+export const parseNormalDef=(str,ctx)=>{
     const out=[];
-    let [err,entry,def]=patchDef(rawdef,ctx);
+    let [err,entry,def]=patchDef(str,ctx);
 
 	let defs=ctx.lexicon.getDefs(entry);
 	if (!defs) { //查無此詞, 試試去掉結尾長音
@@ -132,7 +180,7 @@ export const parseNormalDef=(rawdef,ctx)=>{
 			entry=entry.replace(/ī$/,'i').replace(/ā$/,'a').replace(/ū$/,'u');
 			defs=ctx.lexicon.getDefs(entry);
 		} 
-		if (!defs && ~rawdef.indexOf('’n')) { //append ṃ
+		if (!defs && ~def.indexOf('’n')) { //append ṃ
 			defs=ctx.lexicon.getDefs(entry+'ṃ');
 		}
 	}
@@ -143,7 +191,7 @@ export const parseNormalDef=(rawdef,ctx)=>{
 		//SameAs 一開始是數字。然後不斷更新為最新的定義
 		if (!ctx.SameAs[entry])console.log('cannot find 同上 for entry',entry,'in',ctx.pn);
 		def=ctx.SameAs[entry];//取最接近的定義
-		if (typeof def!=='string') {// 之前沒出現過，只好用第一組定義
+		if (typeof def=='number') {// 之前沒出現過，只好用第一組定義
 			def=defs[0]; //直接用第一組定義
 		}
 	} else {
@@ -214,15 +262,14 @@ export const reuseLemmas=(rawdef,lemmas,j,ctx)=>{
 }
 
 
-
 export const dumpGrammar=(lines,ctx,cb)=>{
-	if (!ctx.stat) ctx.stat={total:0,ambigous:0,miss:0};
-	const emit=(a1,a2,a3,a4,a5)=>{
-
+	if (!ctx.stat) ctx.stat={total:0,ambigous:0,miss:0,
+		lex:0};
+	function emit(){
 		if (cb) {
-			cb(a1,a2,a3,a4,a5);
+			cb.apply(null, arguments );
 		} else if (ctx.onData) {
-			ctx.onData(a1,a2,a3,a4,a5)
+			ctx.onData.apply(null,arguments )
 		}
 	}
 	eachSentence(lines,ctx,(pn,pali,rawdefs)=>{
@@ -237,7 +284,6 @@ export const dumpGrammar=(lines,ctx,cb)=>{
 				const references=parseReferences(rawdefs[i]);
 				for (let j=0;j<references.length;j++) {
 					let  lex=ctx.pnLexicon[references[j]];
-
 					if (!lex) {
 						const pnpatch=pnpatches[patchkey];
 						if (pnpatch) {
@@ -248,7 +294,7 @@ export const dumpGrammar=(lines,ctx,cb)=>{
 						}
 					}
 					if (!lex){
-						console.log('unknown reference',references[j]);
+						console.log(ctx.htmlfn,pn,'broken reference',references[j]);
 					} else {
 						lemmas.push(...lex.lemmas);
 						defs.push(...lex.defs);
@@ -278,17 +324,30 @@ export const dumpGrammar=(lines,ctx,cb)=>{
 			
 			if (!~at1) { //not found , try decomposed            
 				const at3=decomposed[tk];
+				let miss='';
 				if (at3) {
 					for (let j=0;j<decomposed[tk].length;j++) {
 						const at4=lemmas.indexOf(decomposed[tk][j]);
 						emit(pn, i, j==0?tokens[i].text:'', decomposed[tk][j], defs[at4])
 					}
 				} else {
-					if (!~skipwords.indexOf(tk)) {
+					if (ctx.lexicon.contains(tk)) {
+						ctx.stat.globallex++;
+						//ugly , lexicon use old format 依（屬） no \t in between
+						const defs=tidyDefLine(tk+'\t'+ctx.lexicon.getDefs(tk)[0] ,ctx).split('\t')
+						defs.shift();
+						emit(pn,i,tokens[i].text, tk, defs.join('\t'));	
+						continue;
+					} else if (!~skipwords.indexOf(tk)) {
 						ctx.stat.miss++;
-						console.log('miss',pn,tokens[i].text)
+						if (!ctx.misses) ctx.misses={};
+						if (!ctx.misses[tk]) ctx.misses[tk]=0;
+						ctx.misses[tk]++;
+						//console.log('miss',pn,tokens[i].text)
+						miss='MISS'
 					}
-					emit(pn,i,tokens[i].text);
+				
+					emit(pn,i,tokens[i].text,tk,miss);
 				}
 			} else {
 				emit(pn,i ,tokens[i].text, tk, defs[at1]);
@@ -297,3 +356,4 @@ export const dumpGrammar=(lines,ctx,cb)=>{
 		}
 	})
 }
+

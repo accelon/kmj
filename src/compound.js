@@ -86,7 +86,11 @@ export const localDecomp=(lemma,lexicon)=>{ //very simple decompose using local 
 	const out=[];
 	let remain=lemma,found=false;
 	while (remain.length) {
-		found=false;
+        if (remain.length>1 && remain[0]==remain[1]) {
+            remain=remain.slice(1);//double consonant
+        }    
+
+        found=false;
 		for (let i=0;i<lexicon.length;i++) {
 			if (!lexicon[i]) continue;
 			const lex=lexicon[i].replace(/\d+$/,'');
@@ -94,7 +98,7 @@ export const localDecomp=(lemma,lexicon)=>{ //very simple decompose using local 
 				out.push(lexicon[i])
 				remain=remain.slice(lex.length);
 				found=true;
-			}
+            }
 		}
 		if (!found) break;
 	}
@@ -106,25 +110,30 @@ export const localDecomp=(lemma,lexicon)=>{ //very simple decompose using local 
 
 //將
 export const breakCompound=(str,lemmas,knownDecompose)=>{
-
     const validDecompose=(parts)=>{
         for (let i=0;i<parts.length;i++) {
             if (!~(lemmas.indexOf(parts[i]))) return false;
         }
         return true;
     }    
-    const compoundwords=tokenize(str).map(it=>it.text.trim())
+    const compoundwords=tokenize(str).map(it=>it.text.trim().toLowerCase())
     .filter(it=>!!it).filter(it=> !~lemmas.indexOf(it));
     const out={};
     if (!compoundwords) return out;
 
     for (let i=0;i<compoundwords.length;i++) {
-        const w=compoundwords[i]
+        const w=compoundwords[i];
+        const decomp=localDecomp(compoundwords[i],lemmas);
+        if (decomp) {
+            out[compoundwords[i]]=decomp;
+            continue;
+        }
+
         const knowns=knownDecompose[w];
         if (!knowns) continue;
         for (let j=0;j<knowns.length;j++) {
             if (validDecompose(knowns[j])) {
-                out[w]=knowns[j];
+                out[compoundwords[i]]=knowns[j];
             }
         }
     }

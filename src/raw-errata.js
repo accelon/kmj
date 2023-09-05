@@ -81,3 +81,22 @@ export const DefPatch={
 	'an10_111-6':{'asekhāya':'a-śikṣ	名	a	女	単	具	無学'},
 			
 }
+
+//修改 內文
+export const RawPatch={
+    'dn1_168-4':[["natthi","na,atthi",6]],
+    'dn1_171-2':[["naatthi","na atthi"],["natthi","na,atthi",9]],
+     ['dn1_242-3']:[
+        ["vītarāgaṃ","vīta rāgaṃ",2]
+    ],
+    'sn2_150-9':[["natthi","na,atthi",4]],
+    'sn3_212-7':[["natthi","na,atthi",3]]
+}
+
+
+export const RawDefPatch={
+	'dn2_246-1':[['satta\t\t数\t特\t‐\t有（帯）','satta\t\t数\t特\t‐\t有（帯）\t七']],
+	'sn4_351-31':[['labheyyaṃ\t依（属）','labheyyaṃ\tlabh\t動\t願\t能反\t単\t一\t得る']]
+}
+
+

@@ -400,3 +400,13 @@ arūpārammaṇaṃ,arūpa8+ārammaṇaṃ
 asaddhammasaññattiyā,asaddhamma+saññattiyā
 asadosadhammaṃ,asadosa+asarāga+dhammaṃ1
 asajjhāyakatāpi,a+sajjhāya2+katā+pi
+nāssa,na+assa
+cāpi,ca+api
+yatthime,yattha+ime
+idampissa,idam+pi+assa
+kāmūpasaṃhitāni,kāma+upasaṃhitāni
+kāmūpasaṃhitānaṃ,kāma+upasaṃhitānaṃ
+vigatūpakkilese,vigata+upakkilese
+dhammānupassī,dhamma+anupassī
+kāyānupassī,kāya+anupassī
+lokānukampāya,loka+anukampāya

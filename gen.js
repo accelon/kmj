@@ -1,40 +1,51 @@
-import {kluer,nodefs,glob, writeChanged,filesFromPattern, readTextContent,patchBuf, readTextLines} from 'pitaka/cli';
-import Errata from './src/raw-errata.js';
-import {parseRaw} from './src/raw-format.js'; 
-import {TDenList, diffList,tokenizeIASTPunc} from 'pitaka/denote'
-await nodefs; //export fs to global
-const srcfolder='./raw/'
-const desfolder='./json/'
-if (!fs.existsSync(desfolder)) fs.mkdirSync(desfolder);
+/* generate grammar tsv*/
+import {nodefs,readTextContent,readTextLines, filesFromPattern,writeChanged, fromObj} from 'ptk/nodebundle.cjs';
+import {parseLine} from './src/grammar-format.js'
+await nodefs;
+const srcfolder='grammar/'
+const desfolder=''
 
-const pat=process.argv[2]|| 'd1';
-const files=filesFromPattern(pat+'?' , srcfolder);
+const roots={};
+const pss={}
+const bases={}
+const genders={}
+const nums={}
+const cass={};
+const meanings={};
+const statobjects={roots,pss,nums,meanings,bases,genders,cass};
 
-const addDef=(Defs,rawtoken,rawdef)=>{
-    let used=false;
-    Defs.push([rawtoken,{rawdef}]);
+const files=filesFromPattern( '?.tsv' , srcfolder).filter(it=>it.match(/[dmsa]n\d/));
+// files.length=1;
+const incObj=(v,name)=>{
+    if (!v) return;
+    const statobj=statobjects[name+'s']
+    if (!statobj[v]) statobj[v]=0;
+    statobj[v]++;
 }
-
-files.forEach(fn=>{
-    const content=patchBuf( readTextContent(srcfolder+fn), Errata[fn]);
-    const sents=parseRaw(content.split(/\r?\n/));
-    sents.forEach(({pali,defs},idx)=>{
-        const vri=new TDenList(pali,{akey:'vri',lang:'iast'});
-        const Defs=[];
-        defs.forEach(def=>{
-            const at=def.indexOf('\t');
-            if (at>0) {
-                addDef(Defs,def.slice(0,at),def.slice(at+1));
-            } else {//macro
-                
-            }
-        });
-        const kmj=new TDenList(Defs,{akey:'kmj',lang:'iast'});
+const compiletsv=(fn)=>{
+    const lines=readTextLines(srcfolder+fn);
+    for (let i=0;i<lines.length;i++) {
+        const obj=parseLine(lines[i]);
+        incObj(obj.ps,'ps');
+        incObj(obj.cas,'cas');
+        incObj(obj.num,'num');
         
-        const diff=diffList(vri,kmj);//.filter(it=>it.m);
-        if (idx==0){
-            console.log(diff);//,vri.data,kmj.data)
-        }
-    })
-})
-// readTextContent(srcfolder+fn+)
+        incObj(obj.base,'base');
+        incObj(obj.gender,'gender');
+
+        const rootfrag=(obj.root||'').replace(/ /g,'').split(/[・（）\(\),､、→／，～「」]/);
+        rootfrag.forEach(it=>incObj(it,'root'));
+
+        // if (obj.cas=='善き、善巧の、巧みな') console.log(fn,obj.pn)
+        const meaningfrag=(obj.meaning||'').replace(/ /g,'').split(/[・（）\(\),､、→／，～「」]/);
+        meaningfrag.forEach(it=>incObj(it,'meaning'));
+    }
+    
+}
+files.forEach(compiletsv)
+for (let i in statobjects) {
+    let arr=fromObj( statobjects[i],(a,b)=>[a,b]);
+    arr.sort((a,b)=>b[1]-a[1]);
+    arr=arr.map(it=>it.join('\t'))
+    writeChanged('stat/stat-'+i+'.txt',arr.join('\n'),true)
+}

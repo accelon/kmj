@@ -118,3 +118,17 @@ export const test6=`^n1-2
 ㊔mattehi		形	a	中	複	具	量、だけ、のみ、程度
 ㊔bhikkhu	bhikṣ	名	u	男	帯	比丘
 ㊔satehi.		数	a	中	複	具	百`.split(/\r?\n/);
+
+//should return 201-24 , 205-5, 205-6
+export const test7=`^n201-24
+㊣201-24
+^n204-1
+㊣ 204. ‘‘Tatraggivessana, ye te samaṇabrāhmaṇā evaṃvādino evaṃdiṭṭhino –
+㊔204. ‘‘Tatraggivessana, ye te samaṇabrāhmaṇā evaṃvādino evaṃdiṭṭhino – (201-24.)
+^n205-5
+㊣205-5
+^n205-6
+㊣205-6
+^n205-8
+㊣ dukkhaṃyeva tasmiṃ samaye vedanaṃ vedeti.
+㊔dukkhaṃyeva tasmiṃ samaye vedanaṃ vedeti. (205-5, 6.)`.split(/\r?\n/);

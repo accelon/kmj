@@ -1,15 +1,7 @@
 /* 修改 raw\*.txt 以通過文法展開 */
 
 
-export const rawpatches={
-    'dn1_168-4':[["natthi","na,atthi",6]],
-    'dn1_171-2':[["naatthi","na atthi"],["natthi","na,atthi",9]],
-     ['dn1_242-3']:[
-        ["vītarāgaṃ","vīta rāgaṃ",2]
-    ],
-    'sn2_150-9':[["natthi","na,atthi",4]],
-    'sn3_212-7':[["natthi","na,atthi",3]],
-}
+
 
 export const reuselemmadecomp={//同上中  沒有被展開的長詞
     'appekacce':['api','ekacce'],
