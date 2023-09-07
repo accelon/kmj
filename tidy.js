@@ -17,11 +17,12 @@ const books=meta_sc.booksOf(bkid);
 const tidypali=str=>{
 	return str.replace(/‘‘/g,'“').replace(/’’/g,'”')
 }
-const ctx={};
+const ctx={prevpn:0}; 
 const toPlainText=(content,fn)=>{
 	content=tidypali(content)
 	const at=content.indexOf('<script');
 	const out=['㊑'+fn]; //加上檔名比較好找
+	out.push('^n'+(ctx.prevpn+1)+'-0'); //還沒出現 ^n 之前，補一個虛的號，讓小標題歸入同一段。
 	content=content.slice(0,at);
 
 	content=entity2unicode(content);
@@ -44,6 +45,7 @@ const toPlainText=(content,fn)=>{
 			ctx.pn=m[1];
 			ctx.patchkey=ctx.book+'_'+ctx.pn;
 			out.push('^n'+ctx.pn);
+			ctx.prevpn=parseInt(ctx.pn);
 			prefix='㊣';continue;
 		}
 		const first5=line.slice(0,5);

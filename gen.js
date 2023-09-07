@@ -33,12 +33,15 @@ const compiletsv=(fn)=>{
         incObj(obj.base,'base');
         incObj(obj.gender,'gender');
 
-        const rootfrag=(obj.root||'').replace(/ /g,'').split(/[・（）\(\),､、→／，～「」]/);
-        rootfrag.forEach(it=>incObj(it,'root'));
+        incObj(obj.root,'root');
+        incObj(obj.meaning,'meaning');
+
+        //const rootfrag=(obj.root||'').replace(/ /g,'').split(/[・（）\(\),､、→／，～「」]/);
+        //rootfrag.forEach(it=>incObj(it,'root'));
 
         // if (obj.cas=='善き、善巧の、巧みな') console.log(fn,obj.pn)
-        const meaningfrag=(obj.meaning||'').replace(/ /g,'').split(/[・（）\(\),､、→／，～「」]/);
-        meaningfrag.forEach(it=>incObj(it,'meaning'));
+        //const meaningfrag=(obj.meaning||'').replace(/ /g,'').split(/[・（）\(\),､、→／，～「」]/);
+        //meaningfrag.forEach(it=>incObj(it,'meaning'));
     }
     
 }

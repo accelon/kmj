@@ -32,7 +32,7 @@ lexicon = 以entry為主鍵的詞典，每個entry 有 sense 的陣列。
 ## grammar 逐詞文法
 產生每一冊的逐字文法檔
     
-    node grammar [bkid]
+    node grammarlist [bkid]
 
 ## json
 
