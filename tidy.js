@@ -17,6 +17,13 @@ const books=meta_sc.booksOf(bkid);
 const tidypali=str=>{
 	return str.replace(/‘‘/g,'“').replace(/’’/g,'”')
 }
+//㊑  htm 檔名
+//㊣  巴利原文
+//㉆  譯文
+//㊟  注釋
+//㊔  名詞
+//㊒  動詞
+
 const ctx={prevpn:0}; 
 const toPlainText=(content,fn)=>{
 	content=tidypali(content)
@@ -27,6 +34,7 @@ const toPlainText=(content,fn)=>{
 
 	content=entity2unicode(content);
 	content=content.replace(/\n/g,' ')
+	.replace(/ class="font11">([A-Za-z\&‘])/g,'>㊣$1')  //for pali text without pn
 	.replace(/<font class="font[789]">　<\/font>/g,'㊣') //for pali text without pn
 	.replace(/<\/font><font [^>]+?>/g,'')
 	.replace(/<tr/g,'\n<tr').replace(/<td/g,'\t<td')

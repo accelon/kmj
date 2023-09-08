@@ -1,6 +1,6 @@
 /* generate grammar tsv*/
 import {nodefs,readTextContent,readTextLines, filesFromPattern,writeChanged, fromObj} from 'ptk/nodebundle.cjs';
-import {GRAMMAR_CODE_START,parseLine} from './src/grammar-format.js'
+import {parseLine} from './src/grammar-format.js'
 await nodefs;
 const srcfolder='grammar/'
 const desfolder=''
@@ -49,11 +49,6 @@ files.forEach(compiletsv)
 for (let i in statobjects) {
     let arr=fromObj( statobjects[i],(a,b)=>[a,b]);
     arr.sort((a,b)=>b[1]-a[1]);
-    const stat=arr.map(it=>it.join('\t'))
-
-    writeChanged('stat-'+i+'.txt',stat.join('\n'),true)
-
-    const tsv=arr.map((it,idx)=>(idx+GRAMMAR_CODE_START)+'\t'+it[0]);
-    tsv.unshift('^:<name=grammar_'+i+' preload=true>\ttext')
-    writeChanged('../cs/off/'+i+'.tsv',tsv.join('\n'),true)
+    arr=arr.map(it=>it.join('\t'))
+    writeChanged('../cs/off/'+i+'.tsv',arr.join('\n'),true)
 }

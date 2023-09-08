@@ -4,10 +4,12 @@ export const parseLine=line=>{
     const [pn,rawtoken,lemma,root, ps,base,gender,num,cas,meaning ]=line.split('\t');
     return {pn,rawtoken,lemma,root,ps, base,gender,num,cas,meaning};
 }
+export const GRAMMAR_CODE_NULL=4
+export const GRAMMAR_CODE_START=5;
 export const loadGrammarCode=(codename,folder='')=>{
     const lines=readTextLines(folder+'stat/stat-'+codename+'.txt');
     const out={};
-    let code=3;
+    let code=GRAMMAR_CODE_START; //  1:token seperator, 2:part seperator, 3:lemma with no grammar, 4:null-grammar code
     for (let i=0;i<lines.length;i++) {
         const [v]=lines[i].split('\t');
         out[v]=code++;
@@ -40,22 +42,23 @@ export const loadGrammar=(fn,folder='')=>{
         if (!out[pn]) out[pn]=[];
         const rawtoken=fromIAST(obj.rawtoken);
         if (obj.lemma) {
-            const root=obj.root?GCodes.roots[obj.root]:2;
-            const ps=obj.ps?GCodes.pss[obj.ps]:2;
-            const base=obj.base?GCodes.bases[obj.base]:2;
-            const gender=obj.gender?GCodes.genders[obj.gender]:2;
-            const num=obj.num?GCodes.nums[obj.num]:2;
-            const cas=obj.cas?GCodes.cass[obj.cas]:2;
-            const meaning=obj.meaning?GCodes.meanings[obj.meaning]:2;
+            const root=obj.root?GCodes.roots[obj.root]:GRAMMAR_CODE_NULL;
+            const ps=obj.ps?GCodes.pss[obj.ps]:GRAMMAR_CODE_NULL;
+            const base=obj.base?GCodes.bases[obj.base]:GRAMMAR_CODE_NULL;
+            const gender=obj.gender?GCodes.genders[obj.gender]:GRAMMAR_CODE_NULL;
+            const num=obj.num?GCodes.nums[obj.num]:GRAMMAR_CODE_NULL;
+            const cas=obj.cas?GCodes.cass[obj.cas]:GRAMMAR_CODE_NULL;
+            const meaning=obj.meaning?GCodes.meanings[obj.meaning]:GRAMMAR_CODE_NULL;
             const lemma=fromIAST(obj.lemma)
             if (obj.rawtoken) {
                 wordgrammar=[];
-                out.push([rawtoken,wordgrammar]);
+                out[pn].push([rawtoken,wordgrammar]);
             }
             wordgrammar.push(`${lemma},${root},${ps},${base},${gender},${num},${cas},${meaning}`);
         } else {
-            out.push([obj.rawtoken,null]);
+            out[pn].push([obj.rawtoken,null]);
         }
     }
     return out;
 }
+

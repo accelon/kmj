@@ -34,12 +34,7 @@ lexicon = 以entry為主鍵的詞典，每個entry 有 sense 的陣列。
     
     node grammarlist [bkid]
 
-## json
+## 搭配 accelon/cs 
+產生 cs 需要的對照表
 
-轉成經文 json 格式，以「段.句」為key ，含巴利原文，以及當段lemma串。
-lemma 有引用其他經段的，須設法展開。
-
-    node json
-
-比較經文及lemma串，產生逐詞拆分表 , {長詞:["拆法","拆法1"]}
-並將經文串流標為lemma
+    node gen-cs
