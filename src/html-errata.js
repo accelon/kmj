@@ -31,8 +31,17 @@
 		['n&#257;</font><font class="font14">nus&#257;si','na</font> <font class="font14">anus&#257;si'],
 		['n&#257;</font><font class="font14">bhisambhosi','na</font> <font class="font14">abhisambhosi'],
 	],
+	"mn/mn07c06.htm":[['128--26','128-26']],
+	"mn/mn08c17.htm":[['23<font class="font16">１</font><font class="font15">','231']],
+	"mn/mn12c21.htm":[['15-5, 11, 12','155-11, 12.']],
+	"mn/mn13c15.htm":[['236-19-23.','236-19,23.']],
+	"mn/mn14c04.htm":[['28<font class="font15">４','284']],
+	"mn/mn15c13.htm":[['１','1']],
+	"sn/sn12c18.htm":[['45.','32.']],
 
-	"sn/sn35c026.htm":[['25-8.','26-38.']],
+	"sn/sn35c026.htm":[['25-8.','26-38.'],['25-19','26-19']],
+	"sn/sn35c089.htm":[['106-18-29','106-18,29']],
+
 	"an/an08c87.htm":[['88-4','87-4']],
 
 }

@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/accelon/kmj#readme",
   "dependencies": {
-    "iconv-lite": "^0.6.3"
+    "iconv-lite": "^0.6.3",
+    "js-mdict": "^5.0.2"
   }
 }

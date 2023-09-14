@@ -86,6 +86,7 @@ books.forEach(book=>{
 	const files=filesOf(book,srcfolder);
 	const out=[];
 	ctx.book=book;
+	ctx.prevpn=0; // reset pn , check sn4.txt , first pn should not be 717-0
 	files.forEach(fn=>{
 		const errata=HTMLErrata[fn];
 		let content=patchBuf(readTextContent(srcfolder+fn),errata);
