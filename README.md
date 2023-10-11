@@ -5,7 +5,7 @@ komyoji html to offtext
 ## dump 抓網頁
 從光明寺網站取回html，放到 html/?n 目錄，去除中間目錄。
 
-    node dump [pat]
+    node crawl [pat]
     pat: dn,mn,sn,an,kn
 
 
@@ -38,3 +38,7 @@ lexicon = 以entry為主鍵的詞典，每個entry 有 sense 的陣列。
 產生 cs 需要的對照表
 
     node gen-cs
+
+## 產生 日譯對齊文件 到 off
+
+    node gen-jp

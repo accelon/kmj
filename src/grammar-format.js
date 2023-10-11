@@ -31,6 +31,7 @@ export const loadGrammarCodes=(folder='')=>{
 let GCodes;
 export const loadGrammar=(fn,folder='')=>{
     if (!fn.endsWith('.tsv'))fn+='.tsv';
+    if (!fs.existsSync(fn)) return [];
     const lines=readTextLines(fn);
     const out=[];
     let wordgrammar=[]; //

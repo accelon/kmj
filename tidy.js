@@ -23,13 +23,20 @@ const tidypali=str=>{
 //㊟  注釋
 //㊔  名詞
 //㊒  動詞
-
+const nopn0={ //大部份的htm 開頭都是段落開頭，除了這些
+	'dn/dn24c07.htm':1,
+	'dn/dn26c06.htm':1, 
+	'dn/dn33c07.htm':1,
+	'dn/dn34c09.htm':1,
+	'dn/dn34c12.htm':1,
+}
 const ctx={prevpn:0}; 
 const toPlainText=(content,fn)=>{
 	content=tidypali(content)
 	const at=content.indexOf('<script');
 	const out=['㊑'+fn]; //加上檔名比較好找
-	out.push('^n'+(ctx.prevpn+1)+'-0'); //還沒出現 ^n 之前，補一個虛的號，讓小標題歸入同一段。
+
+	if (!nopn0[fn]) out.push('^n'+(ctx.prevpn+1)+'-0'); //還沒出現 ^n 之前，補一個虛的號，讓小標題歸入同一段。
 	content=content.slice(0,at);
 
 	content=entity2unicode(content);
@@ -93,5 +100,6 @@ books.forEach(book=>{
 		const output=toPlainText(content,fn);
 		out.push(...output);
 	});
+	
 	writeChanged(desfolder+book+'.txt',out.join('\n'),true);
 })
