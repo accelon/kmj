@@ -29,6 +29,13 @@ const nopn0={ //大部份的htm 開頭都是段落開頭，除了這些
 	'dn/dn33c07.htm':1,
 	'dn/dn34c09.htm':1,
 	'dn/dn34c12.htm':1,
+	'mn/mn04c21.htm':1,
+	'mn/mn04c23.htm':1,
+	'mn/mn09c38.htm':1,
+	'mn/mn09c39.htm':1,
+	'mn/mn10c26.htm':1,
+	'mn/mn13c23.htm':1,
+	'mn/mn14c08.htm':1,
 }
 const ctx={prevpn:0}; 
 const toPlainText=(content,fn)=>{
@@ -89,6 +96,28 @@ const toPlainText=(content,fn)=>{
 	}
 	return out;
 }
+const epilog=(book,lines)=>{
+	if (book=='mn2') {
+		//443-12 , 443-13 redundant
+		let at=lines.indexOf('^n444-13');
+		const at2=lines.indexOf('^n443-12',at+1);
+		const at3=lines.indexOf('^n444-14');
+		if (~at2 && ~at3) {
+			lines.splice(at2,at3-at2);
+		} else {
+			console.log('cannot fix epilog 443')
+		}
+	} else if (book=='mn3') {
+		let at=lines.indexOf('^n167-2');
+		const at2=lines.indexOf('^n166-3',at+1);
+		if (~at2) {
+			lines[at2]='^n167-3';
+		} else {
+			console.log('cannot fix epilog 167',at,at2)
+		}
+	}
+	return lines;
+}
 books.forEach(book=>{	
 	const files=filesOf(book,srcfolder);
 	const out=[];
@@ -100,6 +129,8 @@ books.forEach(book=>{
 		const output=toPlainText(content,fn);
 		out.push(...output);
 	});
+
+	epilog(book,out)
 	
 	writeChanged(desfolder+book+'.txt',out.join('\n'),true);
 })
