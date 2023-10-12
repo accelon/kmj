@@ -36,6 +36,7 @@ const nopn0={ //大部份的htm 開頭都是段落開頭，除了這些
 	'mn/mn10c26.htm':1,
 	'mn/mn13c23.htm':1,
 	'mn/mn14c08.htm':1,
+	'sn/sn12c74.htm':1,
 }
 const ctx={prevpn:0}; 
 const toPlainText=(content,fn)=>{
