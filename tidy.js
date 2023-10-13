@@ -5,6 +5,7 @@ import {filesOf} from './src/kmj-folder.js'
 import {tidyDefLine,patchRawDef} from './src/raw-format.js'
 import HTMLErrata from './src/html-errata.js';
 import { RawDefPatch } from './src/raw-errata.js';
+import {custompn} from './custompn.js'
 await nodefs; //export fs to global
 const srcfolder='./html/'; 
 const desfolder='./raw/';
@@ -23,28 +24,17 @@ const tidypali=str=>{
 //㊟  注釋
 //㊔  名詞
 //㊒  動詞
-const nopn0={ //大部份的htm 開頭都是段落開頭，除了這些
-	'dn/dn24c07.htm':1,
-	'dn/dn26c06.htm':1, 
-	'dn/dn33c07.htm':1,
-	'dn/dn34c09.htm':1,
-	'dn/dn34c12.htm':1,
-	'mn/mn04c21.htm':1,
-	'mn/mn04c23.htm':1,
-	'mn/mn09c38.htm':1,
-	'mn/mn09c39.htm':1,
-	'mn/mn10c26.htm':1,
-	'mn/mn13c23.htm':1,
-	'mn/mn14c08.htm':1,
-	'sn/sn12c74.htm':1,
-}
+
 const ctx={prevpn:0}; 
 const toPlainText=(content,fn)=>{
 	content=tidypali(content)
 	const at=content.indexOf('<script');
 	const out=['㊑'+fn]; //加上檔名比較好找
 
-	if (!nopn0[fn]) out.push('^n'+(ctx.prevpn+1)+'-0'); //還沒出現 ^n 之前，補一個虛的號，讓小標題歸入同一段。
+	if (!custompn[fn]) out.push('^n'+(ctx.prevpn+1)+'-0'); //還沒出現 ^n 之前，補一個虛的號，讓小標題歸入同一段。
+	else if (parseInt(custompn[fn])>0) {
+		out.push('^n'+custompn[fn]+'-0');
+	}
 	content=content.slice(0,at);
 
 	content=entity2unicode(content);
@@ -57,6 +47,7 @@ const toPlainText=(content,fn)=>{
 	
 	let prefix='㊣';
 	ctx.fn=fn;
+
 	for (let i=0;i<lines.length;i++) {
 		let line=lines[i].replace(/<[^>]+>/g,' ')
 		          .replace(/　/g,' ').replace(/ +/g,' ').replace(/ ?\t ?/g,'\t').trim();
@@ -65,6 +56,7 @@ const toPlainText=(content,fn)=>{
 		if (line.indexOf('←前へ')>-1) continue;
 		const m=line.match(/^([\d\-]+)\.$/);
 		if (m) {
+			 if (ctx.fn=='sn/sn48c74.htm') console.log(m[1])
 			ctx.pn=m[1];
 			ctx.patchkey=ctx.book+'_'+ctx.pn;
 			out.push('^n'+ctx.pn);

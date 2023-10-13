@@ -52,7 +52,31 @@ export const epilog=(fn,lines)=>{
         combinnextline(lines,'^n224「第二の行品」');
         combinnextline(lines,'^n250「第三の行品」');
         combinnextline(lines,'^n276「第四の行品」');
+    } else if (fn=='sn4.txt') {
+        combinnextline(lines,'^n104「軛安穏者品」');
+    } else if (fn=='sn5.txt') {
+        combinnextline(lines,'^n21「邪性品」')
+        combinnextline(lines,'^n31「行道品」（『相応部』45-31）');
+        combinnextline(lines,'^n161「尋求品」');
+        combinnextline(lines,'^n172「暴流品」');
+        combinnextline(lines,'^n312-323「再ガンガー略品」');
+        combinnextline(lines,'^n324-333「再不放逸品」');
+        combinnextline(lines,'^n334-345「再力所作品」');  
+        combinnextline(lines,'^n357-366「再暴流品」'); 
 
+        combinnextline(lines,'^n461-470「暴流品」'); 
+        combinnextline(lines,'^n587-596「暴流品」');
+        combinnextline(lines,'^n695-704「暴流品」'); 
+        combinnextline(lines,'^n977「出入息相応」「一法品」'); 
+
+        combinnextline(lines,'^n511「老品」');
+        combinnextline(lines,'^n531「覚分品」');
+        combinnextline(lines,'^n541-552「ガンガー略品」');
+        combinnextline(lines,'^n833「鉄球品」');
+        combinnextline(lines,'^n845-856「ガンガー略品」');
+        combinnextline(lines,'^n923-934「禅相応」',2);
+        combinnextline(lines,'^n997「預流相応」「ヴェールドヴァーラ品」');
+        combinnextline(lines,'^n1047「有慧品」');
     }
 
     return lines;

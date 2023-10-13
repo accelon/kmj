@@ -108,7 +108,16 @@
 	"sn/sn12c18.htm":[['45.','32.']],
 
 	"sn/sn35c026.htm":[['25-8.','26-38.'],['25-19','26-19']],
+
 	"sn/sn35c089.htm":[['106-18-29','106-18,29']],
+
+	
+	"sn/sn46c64.htm":[['<font class="font9">　</font><font\n  class="font8">312-323','312-323.<tr/>']], //tr to force line break
+	"sn/sn46c65.htm":[['<font class="font9">　</font><font\n  class="font8">324-333','324-333.<tr/>']],
+	"sn/sn46c66.htm":[['<font class="font9">　</font><font\n  class="font8">334-345','334-345.<tr/>']],
+	"sn/sn46c67.htm":[['<font class="font9">　</font><font\n  class="font8">346-356','346-356.<tr/>']],
+	"sn/sn46c68.htm":[['<font class="font9">　</font><font\n  class="font8">357-366','357-366.<tr/>']],
+	"sn/sn55c13.htm":[['1008-20','1009-23']],
 
 	"an/an08c87.htm":[['88-4','87-4']],
 
