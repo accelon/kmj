@@ -47,5 +47,5 @@ export const custompn={ //  大部份的htm 沿繼 之前的pn，除非另行指
     'sn/sn53c05.htm':967,
     'sn/sn54c01.htm':977,
     'sn/sn56c097.htm':1172,
-    
+    'an/an11c32.htm':true,
 }

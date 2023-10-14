@@ -6,6 +6,11 @@ const replaceLine=(lines,from,to)=>{
         console.log('cannot replace line',from)
     }
 }
+const removeLines=(lines, from,to)=>{
+    for (let i=from;i<=to;i++) {
+        replaceLine(lines,'^n'+i,'');
+    }
+}
 export const prolog=(fn,lines)=>{
     if (fn=='dn3.txt') {
         const at=lines.indexOf('^n294')
@@ -272,6 +277,253 @@ export const prolog=(fn,lines)=>{
         replaceLine(lines,'^n967-976','^n935-966 \n^n967-976');
 
         lines=lines.join('\n').split('\n')
+    } else if (fn=='an1.txt') {
+        replaceLine(lines,'^n102','^n102-109');
+        replaceLine(lines,'^n118','^n118-128');
+        replaceLine(lines,'^n132','^n132-139');
+        replaceLine(lines,'^n142','^n142-149');
+        replaceLine(lines,'^n152','^n152-159');
+        replaceLine(lines,'^n162','^n162-169');
+        replaceLine(lines,'^n175','^n175-186');
+        replaceLine(lines,'^n281','^n281-283');
+        replaceLine(lines,'^n285','^n285-286');
+        replaceLine(lines,'^n288','^n288-289');
+        replaceLine(lines,'^n291','^n291-292');
+        replaceLine(lines,'^n294','^n294-295');
+        replaceLine(lines,'^n336','^n336-338');
+        replaceLine(lines,'^n339','^n339-341');
+        replaceLine(lines,'^n342','^n342-344');
+        replaceLine(lines,'^n345','^n345-347');
+        replaceLine(lines,'^n348','^n348-350');
+        replaceLine(lines,'^n351','^n351-353');
+        replaceLine(lines,'^n354','^n354-356');
+        replaceLine(lines,'^n357','^n357-359');
+        replaceLine(lines,'^n360','^n360-362');
+        replaceLine(lines,'^n363','^n363-365');
+        replaceLine(lines,'^n366','^n366-381');
+        replaceLine(lines,'^n383','^n383-389');
+        replaceLine(lines,'^n390','^n390-393');
+        replaceLine(lines,'^n394','^n394-397');
+        replaceLine(lines,'^n398','^n398-401');
+        replaceLine(lines,'^n402','^n402-406');
+        replaceLine(lines,'^n407','^n407-411');
+        replaceLine(lines,'^n412','^n412-418');
+        replaceLine(lines,'^n419','^n419-426');
+        replaceLine(lines,'^n427','^n427-434');
+        replaceLine(lines,'^n435','^n435-442');
+        replaceLine(lines,'^n443','^n443-452');
+        replaceLine(lines,'^n453','^n453-462');
+        replaceLine(lines,'^n463','^n463-472');
+        replaceLine(lines,'^n473','^n473-482');
+        replaceLine(lines,'^n483','^n483-492');
+        replaceLine(lines,'^n493','^n493-562');
+        replaceLine(lines,'^n564','^n564-570');
+        replaceLine(lines,'^n575','^n575-576');
+        replaceLine(lines,'^n577','^n577-579');
+        replaceLine(lines,'^n580','^n580-583');
+        replaceLine(lines,'^n584','^n584-599');
+        replaceLine(lines,'^n133','');
+        replaceLine(lines,'^n503','');
+        replaceLine(lines,'^n513','');
+        replaceLine(lines,'^n523','');
+        replaceLine(lines,'^n533','');
+        replaceLine(lines,'^n543','');
+        replaceLine(lines,'^n585','');
+        
+        removeLines(lines,103,109);
+        removeLines(lines,119,128);
+        removeLines(lines,134,139);
+        removeLines(lines,143,149);
+        removeLines(lines,153,159);
+        removeLines(lines,163,169);
+        // removeLines(lines,176,186);
+        // removeLines(lines,282,283);
+        removeLines(lines,286,286);
+        removeLines(lines,289,289);
+        removeLines(lines,292,292);
+        removeLines(lines,295,295);
+        removeLines(lines,337,338);
+        removeLines(lines,340,341);
+        removeLines(lines,343,344);
+        removeLines(lines,346,347);
+        removeLines(lines,349,350);
+        removeLines(lines,352,353);
+        removeLines(lines,355,356);
+        removeLines(lines,358,359);
+        removeLines(lines,361,362);
+        removeLines(lines,364,365);
+        removeLines(lines,367,381);
+        removeLines(lines,384,389);
+        removeLines(lines,391,393);
+        removeLines(lines,395,397);
+        removeLines(lines,399,401);
+        removeLines(lines,403,406);
+        removeLines(lines,408,411);
+        removeLines(lines,413,418);
+        removeLines(lines,420,426);
+        removeLines(lines,428,434);
+        removeLines(lines,436,442);
+        removeLines(lines,444,452);
+        removeLines(lines,454,462);
+        removeLines(lines,464,472);
+        removeLines(lines,474,482);
+        removeLines(lines,484,492);
+        // removeLines(lines,494,562);
+        removeLines(lines,553,555);
+        removeLines(lines,556,562);
+
+        // removeLines(lines,565,570);
+        // removeLines(lines,576,576);
+        // removeLines(lines,578,579);
+        // removeLines(lines,581,583);
+        // removeLines(lines,585,599);
+    } else if (fn=='an2.txt') {
+        replaceLine(lines,'^n191','^n191-200');
+        replaceLine(lines,'^n202','^n202-230');
+        replaceLine(lines,'^n232','^n232-246');
+        replaceLine(lines,'^n247','');
+
+        removeLines(lines,192,200);
+        removeLines(lines,203,230);
+        removeLines(lines,233,246);
+    } else if (fn=='an3.txt') {
+        replaceLine(lines,'^n157','^n157-163');
+        replaceLine(lines,'^n164','^n164-183');
+
+        removeLines(lines,158,163);
+        removeLines(lines,165,174);
+    } else if (fn=='an4.txt') {
+        replaceLine(lines,'^n277','^n277-303');
+        replaceLine(lines,'^n304','^n304-783');
+        replaceLine(lines,'^n278','');
+    } else if (fn=='an5.txt') {
+        replaceLine(lines,'^n257','^n257-263');
+        replaceLine(lines,'^n258','');
+        replaceLine(lines,'^n265','^n265-271');
+        replaceLine(lines,'^n266','');
+        replaceLine(lines,'^n273','^n273-285');
+        replaceLine(lines,'^n274','');
+        replaceLine(lines,'^n287','^n287-292');
+        replaceLine(lines,'^n288','');
+        replaceLine(lines,'^n294','^n294-302');
+        replaceLine(lines,'^n295','');
+        replaceLine(lines,'^n308','^n308-1151');
+
+    } else if (fn=='an6.txt') {
+        replaceLine(lines,'^n120','^n120-139');
+        replaceLine(lines,'^n143','^n143-169');
+        replaceLine(lines,'^n170','^n170-649');
+        removeLines(lines,121,139);
+        replaceLine(lines,'^n144','');
+    } else if (fn=='an7.txt') {
+        replaceLine(lines,'^n96','^n96-622');
+        replaceLine(lines,'^n626','^n626-652');
+        replaceLine(lines,'^n653','^n653-1132');
+        replaceLine(lines,'^n97','');
+        replaceLine(lines,'^n627','');
+
+    } else if (fn=='an8.txt') {
+        replaceLine(lines,'^n91','^n91-116');
+        replaceLine(lines,'^n92','');
+        replaceLine(lines,'^n120','^n120-146');
+        replaceLine(lines,'^n121','');
+        replaceLine(lines,'^n147','^n147-626');
+
+    } else if (fn=='an9.txt') {
+        replaceLine(lines,'^n74','^n74-81');
+        replaceLine(lines,'^n84','^n84-91');
+        replaceLine(lines,'^n95','^n95-112');
+        replaceLine(lines,'^n96','');
+        replaceLine(lines,'^n113','^n113-432');
+        
+    } else if (fn=='an10.txt') {
+        replaceLine(lines,'^n156','^n156-166');
+        removeLines(lines,157,166);
+        replaceLine(lines,'^n200','^n200-209');
+        removeLines(lines,201,209);
+        replaceLine(lines,'^n225','^n225-228');
+        removeLines(lines,226,228);
+        replaceLine(lines,'^n229','^n229-232');
+        removeLines(lines,230,232);
+        replaceLine(lines,'^n233','^n233-236');
+        removeLines(lines,234,236);
+        replaceLine(lines,'^n240','^n240-266');
+        replaceLine(lines,'^n241','');
+        replaceLine(lines,'^n267','^n267-746');
+    } else if (fn=='an11.txt') {
+        replaceLine(lines,'^n22','^n22-29'  );
+        removeLines(lines,23,29);
+        replaceLine(lines,'^n30','^n30-69' );
+        replaceLine(lines,'^n38','');
+        replaceLine(lines,'^n46','');
+        replaceLine(lines,'^n54','');
+        replaceLine(lines,'^n62','');
+        replaceLine(lines,'^n63','');
+
+        replaceLine(lines,'^n70','^n70-117' );
+        replaceLine(lines,'^n78','');
+        replaceLine(lines,'^n86','');
+        replaceLine(lines,'^n94','');
+        replaceLine(lines,'^n102','');
+        replaceLine(lines,'^n110','');
+        replaceLine(lines,'^n111','');
+        replaceLine(lines,'^n118','^n118-165');
+        replaceLine(lines,'^n126','');
+        replaceLine(lines,'^n134','');
+        replaceLine(lines,'^n142','');
+        replaceLine(lines,'^n150','');
+        replaceLine(lines,'^n158','');
+        replaceLine(lines,'^n159','');
+        replaceLine(lines,'^n166','^n166-213');
+        replaceLine(lines,'^n174','');
+        replaceLine(lines,'^n182','');
+        replaceLine(lines,'^n190','');
+        replaceLine(lines,'^n198','');
+        replaceLine(lines,'^n206','');
+        replaceLine(lines,'^n207','');
+        
+        replaceLine(lines,'^n214','^n214-261');
+        replaceLine(lines,'^n222','');
+        replaceLine(lines,'^n230','');
+        replaceLine(lines,'^n238','');
+        replaceLine(lines,'^n246','');
+        replaceLine(lines,'^n254','');
+        replaceLine(lines,'^n255','');
+        
+        replaceLine(lines,'^n262','^n262-309',);
+        replaceLine(lines,'^n270','');
+        replaceLine(lines,'^n278','');
+        replaceLine(lines,'^n286','');
+        replaceLine(lines,'^n294','');
+        replaceLine(lines,'^n302','');
+        replaceLine(lines,'^n303','');
+        
+        replaceLine(lines,'^n310','^n310-357');
+        replaceLine(lines,'^n318','');
+        replaceLine(lines,'^n326','');
+        replaceLine(lines,'^n334','');
+        replaceLine(lines,'^n342','');
+        replaceLine(lines,'^n350','');
+        replaceLine(lines,'^n351','');
+        replaceLine(lines,'^n358','^n358-405');
+        replaceLine(lines,'^n366','');
+        replaceLine(lines,'^n374','');
+        replaceLine(lines,'^n382','');
+        replaceLine(lines,'^n390','');
+        replaceLine(lines,'^n398','');
+        replaceLine(lines,'^n399','');
+        replaceLine(lines,'^n406','^n406-453');
+        replaceLine(lines,'^n414','');
+        replaceLine(lines,'^n422','');
+        replaceLine(lines,'^n430','');
+        replaceLine(lines,'^n438','');
+        replaceLine(lines,'^n446','');
+        
+        replaceLine(lines,'^n454','^n454-501');
+        replaceLine(lines,'^n455','');
+        replaceLine(lines,'^n504','^n504-512');
+        replaceLine(lines,'^n512','^n513-672');
+
     }
     return lines;
 }
