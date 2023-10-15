@@ -11,7 +11,31 @@ const pat=process.argv[2]||'';
 let files=filesFromPattern( '?.txt' , srcfolder).filter(it=>it.match(/[dmsa]n\d/));
 if (pat) files=files.filter(it=>~it.indexOf(pat))
 // files.length=1;
+const akbk={
+    'dn1.txt':'^ak#dn【長部】^bk#dn1【長部一】',
+    'dn2.txt':'^bk#dn2【長部二】',
+    'dn3.txt':'^bk#dn3【長部三】',
+    'mn1.txt':'^ak#mn【中部】^bk#mn1【中部一】',
+    'mn2.txt':'^bk#mn2【中部二】',
+    'mn3.txt':'^bk#mn3【中部三】',
+    'sn1.txt':'^ak#sn【相應部】^bk#sn1【相應部一】',
+    'sn2.txt':'^bk#sn2【相應部二】',
+    'sn3.txt':'^bk#sn3【相應部三】',
+    'sn4.txt':'^bk#sn3【相應部三】',
+    'sn5.txt':'^bk#sn3【相應部三】',
+    'an1.txt':'^ak#an【增支部】^bk#an1【增支部一】',
+    'an2.txt':'^bk#an2【增支部二】',
+    'an3.txt':'^bk#an3【增支部三】',
+    'an4.txt':'^bk#an4【增支部四】',
+    'an5.txt':'^bk#an5【增支部五】',
+    'an6.txt':'^bk#an6【增支部六】',
+    'an7.txt':'^bk#an7【增支部七】',
+    'an8.txt':'^bk#an8【增支部八】',
+    'an9.txt':'^bk#an9【增支部九】',
+    'an10.txt':'^bk#an10【增支部十】',
+    'an11.txt':'^bk#an11【增支部十一】',
 
+}
 const dofile=fn=>{
     const lines=readTextLines(srcfolder+fn);
     let paranum='',prevparanum='',i=0;
@@ -39,7 +63,7 @@ const dofile=fn=>{
     }
     return {fn,lines:out,memo};
 }
-const addCk=(lines,sclines,fn)=>{
+const addCkBk=(lines,sclines,fn)=>{
     for (let i=0;i<lines.length;i++) {
         const scline=sclines[i];
         const line=lines[i];
@@ -67,10 +91,11 @@ const addCk=(lines,sclines,fn)=>{
             else lines[i]=lines[i].replace(/「([^」]+)」/,'^'+tag+'#'+id+'「'+m2[1]+'」')
         }
     }
+    lines[0]=(akbk[fn]||'')+lines[0];
 }
 
 const convert=({fn,lines,memo})=>{
-    const outfn=desfolder+fn.replace('.txt','.off');
+    const outfn=desfolder+fn.replace('.txt','.kmj.off');
     const memofn=desfolder+fn.replace('.txt','-notes.off');
     const sc= readTextLines(scfolder+fn.replace('.txt','.sc.off'));
 
@@ -81,7 +106,7 @@ const convert=({fn,lines,memo})=>{
         lines[1]='';
     }
     lines=epilog(fn,lines);
-    addCk(lines,sc,fn);
+    addCkBk(lines,sc,fn);
     
     writeChanged(outfn,lines.join('\n'),true)
     writeChanged(memofn,memo.join('\n'),true)
